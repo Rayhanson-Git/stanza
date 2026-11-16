@@ -77,7 +77,7 @@ source. It keeps itself up to date.
 ## Features
 
 <p align="center">
-  <img src="assets/window.png" alt="The Stanza window: the Branches style playing in the large preview at the top, with the Size, Font, Lock Screen and Aesthetics panel buttons above it and the first row of style tiles below" width="100%">
+  <img src="assets/window.png" alt="The Stanza window: the Departure Board style playing in the large preview, with the Size, Font, Lock Screen and Aesthetics panels, the player buttons and the Settings gear across the top, and the Favourites row below" width="100%">
 </p>
 
 The window (the gallery) plays one style large at the top, the one in use or the one you are browsing, with every style in a grid of tiles below it. Each preview
@@ -128,10 +128,20 @@ runs through `LyricStage`, the same view that draws the real overlay, so what yo
   <img src="assets/style-notifications.png" alt="Notifications style: lyric lines as stacked lock-screen alerts" width="49%">
 </p>
 
+<p align="center">
+  <img src="assets/style-departureboard.png" alt="Departure Board style: lyric lines on a split-flap board" width="49%">
+  <img src="assets/style-highlighter.png" alt="Highlighter style: a marker sweeping the sung words on a printed card" width="49%">
+</p>
+
+<p align="center">
+  <img src="assets/style-receipt.png" alt="Receipt style: the song printed line by line on a till receipt" width="49%">
+  <img src="assets/style-calendar.png" alt="Calendar style: each lyric line as an event in a day planner" width="49%">
+</p>
+
 <p align="center"><sub>Frames drawn by <code>Stanza --render</code> with the app's built-in sample lyrics.</sub></p>
 
 <p align="center">
-  <img src="assets/shelf.png" alt="The All styles shelf in the window: twelve style tiles in three rows" width="100%">
+  <img src="assets/shelf.png" alt="The window's Favourites row and the All styles shelf: all 23 style tiles" width="100%">
 </p>
 
 <p align="center"><sub>The shelf of style tiles in the window, cropped to its first three rows; the Map tile sits below.</sub></p>
