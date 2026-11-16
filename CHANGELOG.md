@@ -2,6 +2,11 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.3.4
+
+- **About Stanza**, at the foot of Settings: the version, who made Stanza, and links to the portfolio at rayhanson.tech, the source on GitHub and what's new.
+- A small "Made by Rayhanson" credit at the bottom right of the window, linking to rayhanson.tech.
+
 ## 0.3.3
 
 - A Settings panel behind the gear at the top right of the window, in the same glass as the other panels. It holds the new **Open at login** switch, **Install updates automatically**, the version and **Check Now**.

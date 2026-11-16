@@ -26,6 +26,7 @@ struct GalleryShelf: View {
                                 action: { onPick(style) }, onPin: { settings.togglePin(style) })
                 }
             }
+            CreditLine(hover: model.hover).padding(.top, 14)
         }
         .padding(.horizontal, 44)
         .padding(.top, 26)

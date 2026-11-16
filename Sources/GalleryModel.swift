@@ -3,7 +3,7 @@ import SwiftUI
 
 /// The panels that can hang from the top bar. Only one is open at a time.
 enum GalleryMenu: String, CaseIterable {
-    case size, font, lockScreen, aesthetics, spotify, music, settings
+    case size, font, lockScreen, aesthetics, spotify, music, settings, about
 
     /// The lyric settings in the centre of the top bar; the players and Settings sit at its right.
     static let lyricSettings: [GalleryMenu] = [.size, .font, .lockScreen, .aesthetics]
@@ -19,6 +19,7 @@ enum GalleryMenu: String, CaseIterable {
         case .spotify: return Player.spotify.displayName
         case .music: return Player.music.displayName
         case .settings: return "Settings"
+        case .about: return "About Stanza"
         }
     }
 

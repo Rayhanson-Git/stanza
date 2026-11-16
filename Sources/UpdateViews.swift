@@ -7,9 +7,10 @@ struct SettingsButton: View {
     @ObservedObject var model: GalleryModel
 
     var body: some View {
-        let isOpen = model.menu == .settings
+        let isOpen = model.menu == .settings || model.menu == .about
         Hoverable(id: "settings", hover: model.hover) { hovered in
-            Button { model.toggle(.settings) } label: {
+            // Closes the card from Settings or About alike; opens Settings otherwise.
+            Button { model.menu = isOpen ? nil : .settings } label: {
                 Image(systemName: "gearshape")
                     .font(.system(size: 17, weight: .medium))
                     .foregroundStyle(.white)
@@ -27,6 +28,7 @@ struct SettingsButton: View {
 
 /// Settings: opening at login, and updates.
 struct SettingsPanel: View {
+    @ObservedObject var model: GalleryModel
     @ObservedObject var loginItem: LoginItem
     let updater: AppUpdater?
 
@@ -47,6 +49,12 @@ struct SettingsPanel: View {
             if let updater {
                 PanelRule()
                 UpdateSettings(updater: updater)
+            }
+            PanelRule()
+            PanelRow(id: "settings.about", hover: model.hover) { model.menu = .about } content: {
+                Text("About Stanza").font(.system(size: 13.5)).foregroundStyle(.white)
+                Spacer()
+                Image(systemName: "chevron.right").font(.system(size: 11, weight: .semibold)).foregroundStyle(.white.opacity(0.6))
             }
         }
         .onAppear { loginItem.refresh() }
