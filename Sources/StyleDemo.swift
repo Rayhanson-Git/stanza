@@ -91,29 +91,66 @@ struct StyleDemo {
     }
 }
 
-/// A demo drawn on a canvas the size of a screen, through the same `LyricStage` as the real overlay.
+/// The song playing right now, for previews that follow it instead of the demo song.
+struct LivePreviewSource {
+    let engine: LyricEngine
+    let monitor: NowPlayingMonitor
+}
+
+/// A demo drawn on a canvas the size of a screen, through the same `LyricStage` as the real overlay. A playing preview
+/// given a `live` source shows the song playing now whenever it has a line to show.
 struct StyleDemoView: View {
     let demo: StyleDemo
     @ObservedObject var settings: AppSettings
+    var live: LivePreviewSource?
 
     var body: some View {
         GeometryReader { geometry in
-            if demo.isPlaying {
+            if demo.isPlaying, let live {
+                FollowingDemoView(demo: demo, settings: settings, engine: live.engine, monitor: live.monitor, size: geometry.size)
+            } else if demo.isPlaying {
                 TimelineView(.animation(paused: demo.paused)) { timeline in
-                    stage(position: demo.position(at: timeline.date), clock: timeline.date.timeIntervalSinceReferenceDate,
-                          size: geometry.size)
-                        .opacity(demo.opacity(at: timeline.date))
+                    Self.demoFrame(demo, at: timeline.date, size: geometry.size, settings: settings)
                 }
             } else {
                 // A still needs no clock at all, and using its own position keeps every render of it identical.
-                stage(position: demo.still, clock: demo.still, size: geometry.size)
+                Self.stage(demo, position: demo.still, clock: demo.still, size: geometry.size, settings: settings)
             }
         }
     }
 
-    private func stage(position: Double, clock: Double, size: CGSize) -> some View {
+    /// One frame of the demo loop, faded at each end so the jump back to the start is never seen.
+    static func demoFrame(_ demo: StyleDemo, at date: Date, size: CGSize, settings: AppSettings) -> some View {
+        stage(demo, position: demo.position(at: date), clock: date.timeIntervalSinceReferenceDate, size: size, settings: settings)
+            .opacity(demo.opacity(at: date))
+    }
+
+    static func stage(_ demo: StyleDemo, position: Double, clock: Double, size: CGSize, settings: AppSettings) -> some View {
         LyricStage(style: demo.style, lyrics: DemoTrack.lyrics(for: demo.style), position: position, clock: clock, size: size, settings: settings,
                    trackTitle: DemoTrack.title, trackArtist: DemoTrack.artist)
+    }
+}
+
+/// A playing preview that shows the song playing now, in time with it, gaps included, exactly as the real lyrics do.
+/// While nothing plays, or for a song without lyrics, it plays the demo instead.
+private struct FollowingDemoView: View {
+    let demo: StyleDemo
+    @ObservedObject var settings: AppSettings
+    @ObservedObject var engine: LyricEngine
+    @ObservedObject var monitor: NowPlayingMonitor
+    let size: CGSize
+
+    var body: some View {
+        TimelineView(.animation(paused: demo.paused)) { timeline in
+            let position = engine.position(at: timeline.date)
+            // Deciding per line would swap in the demo's words during every instrumental gap and back again.
+            if monitor.isPlaying, let lyrics = engine.lyrics {
+                LyricStage(style: demo.style, lyrics: lyrics, position: position, clock: timeline.date.timeIntervalSinceReferenceDate,
+                           size: size, settings: settings, trackTitle: monitor.track?.title ?? "", trackArtist: monitor.track?.artist ?? "")
+            } else {
+                StyleDemoView.demoFrame(demo, at: timeline.date, size: size, settings: settings)
+            }
+        }
     }
 }
 
@@ -126,11 +163,12 @@ struct StyleStage: View {
     let size: CGSize
     let screenHeight: CGFloat
     let settings: AppSettings
+    var live: LivePreviewSource?
 
     var body: some View {
         if size.width > 1, size.height > 1 {
             let scale = size.height / screenHeight
-            StyleDemoView(demo: demo, settings: settings)
+            StyleDemoView(demo: demo, settings: settings, live: live)
                 .frame(width: size.width / scale, height: screenHeight)
                 .scaleEffect(scale)
                 .frame(width: size.width, height: size.height)
@@ -148,12 +186,13 @@ struct TileScene: View {
     let demo: StyleDemo
     let size: CGSize
     let settings: AppSettings
+    var live: LivePreviewSource?
 
     var body: some View {
         let fillsTile = demo.style == .map && settings.mapFillsDisplay
         ZStack {
             StyleBackdrop(style: demo.style)
-            StyleStage(demo: demo, size: size, screenHeight: StyleStage.tileScreenHeight, settings: settings)
+            StyleStage(demo: demo, size: size, screenHeight: StyleStage.tileScreenHeight, settings: settings, live: live)
                 .offset(y: fillsTile ? 0 : -Self.lift * size.height)
         }
         .frame(width: size.width, height: size.height)

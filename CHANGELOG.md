@@ -2,6 +2,12 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.3.6
+
+- **Move Lyrics** is now called **Drag Position**, and **Reset Lyrics Position** is **Reset Position**. The Drag Position card has a size slider, so you can size and place the lyrics in one go.
+- The size slider in the menu bar menu is redrawn from scratch. A standard slider there was drawn greyed out and could ignore the first click whenever Stanza was not the active app, which is why it only worked sometimes.
+- The previews in the Stanza window now follow the song you are playing: the big preview and the style under the pointer show its real lyrics, in time with the music, in whichever style you are looking at. While nothing plays, or for a song without lyrics, they play the built-in demo.
+
 ## 0.3.5
 
 - **Move Lyrics**, in the menu bar menu: a card appears where the lyrics sit; drag it anywhere and click Done (or choose Move Lyrics again). The spot is kept on every display and on the lock screen. **Reset Lyrics Position** puts them back in the middle.

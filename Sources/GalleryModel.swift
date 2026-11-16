@@ -152,6 +152,9 @@ final class GalleryModel: ObservableObject {
 
     func toggle(_ menu: GalleryMenu) { self.menu = self.menu == menu ? nil : menu }
 
+    /// The song playing now, which the playing previews follow.
+    var live: LivePreviewSource { LivePreviewSource(engine: engine, monitor: monitor) }
+
     var heroDemo: StyleDemo {
         StyleDemo(style: browsed, playingSince: settings.reduceMotion ? nil : heroSince,
                   paused: suspended || heroOffscreen || scrolling)

@@ -146,7 +146,7 @@ struct OnboardingView: View {
             .aspectRatio(Metrics.previewAspect, contentMode: .fit)
             .overlay {
                 GeometryReader { geometry in
-                    TileScene(demo: model.heroDemo, size: geometry.size, settings: settings).id(model.browsed).transition(.opacity)
+                    TileScene(demo: model.heroDemo, size: geometry.size, settings: settings, live: model.live).id(model.browsed).transition(.opacity)
                 }
             }
             .clipShape(shape)

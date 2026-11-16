@@ -33,10 +33,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var idleTimer: DispatchWorkItem?
     private static let idleDelay = 10.0
     private var observers: Set<AnyCancellable> = []
-    private weak var textScaleSlider: NSSlider?
-    private var pendingScale: Double?
-    private var scaleQueued = false
-    private static let scaleStep = 0.05
+    private weak var textScaleSlider: SizeSlider?
 
     private var isLocked: Bool { lockMonitor?.isLocked ?? LockMonitor.currentlyLocked() }
 
@@ -164,13 +161,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(item("Keep Screen Awake", #selector(toggleKeepAwake)))
         menu.addItem(item("Show When Unlocked", #selector(toggleShowWhenUnlocked)))
-        menu.addItem(item("Move Lyrics", #selector(toggleMoveLyrics)))
-        menu.addItem(item("Reset Lyrics Position", #selector(resetLyricsPosition)))
+        menu.addItem(item("Drag Position", #selector(toggleMoveLyrics)))
+        menu.addItem(item("Reset Position", #selector(resetLyricsPosition)))
         menu.addItem(.separator())
 
         // It scales the whole style, not only the words, so it is "Size", as in the window.
         menu.addItem(header("Size"))
-        let textScale = sliderItem(settings.textScale, AppSettings.textScaleRange, #selector(textScaleChanged(_:)), #selector(resetTextScale))
+        let textScale = sliderItem(settings.textScale, AppSettings.textScaleRange, #selector(resetTextScale))
         textScaleSlider = textScale.slider
         menu.addItem(textScale.item)
         menu.addItem(.separator())
@@ -209,7 +206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     func menuNeedsUpdate(_ menu: NSMenu) {
-        textScaleSlider?.doubleValue = settings.textScale
+        textScaleSlider?.value = settings.textScale
         menu.items.filter { $0.tag == Tag.style || $0.tag == Tag.display }.forEach(menu.removeItem)
         if let headerIndex = menu.items.firstIndex(where: { $0.tag == Tag.stylesHeader }) {
             for (offset, styleItem) in styleItems().enumerated() { menu.insertItem(styleItem, at: headerIndex + 1 + offset) }
@@ -265,13 +262,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         return menuItem
     }
 
-    private func sliderItem(_ value: Double, _ range: ClosedRange<Double>, _ action: Selector, _ reset: Selector) -> (item: NSMenuItem, slider: NSSlider) {
-        let slider = NSSlider(value: value, minValue: range.lowerBound, maxValue: range.upperBound, target: self, action: action)
-        slider.isContinuous = true
-        // A menu never becomes the active window, so without this the slider is drawn grey, as if switched off.
-        slider.trackFillColor = .controlAccentColor
-        slider.toolTip = "Scales the whole style: words, cards and pictures"
-        slider.frame = NSRect(x: 14, y: 4, width: 158, height: 22)
+    private func sliderItem(_ value: Double, _ range: ClosedRange<Double>, _ reset: Selector) -> (item: NSMenuItem, slider: SizeSlider) {
+        let slider = SizeSlider(frame: NSRect(x: 14, y: 4, width: 158, height: 22), value: value, range: range) { [weak self] scale in
+            self?.settings.textScale = scale
+        }
         let resetButton = NSButton(title: "Reset", target: self, action: reset)
         resetButton.bezelStyle = .rounded
         resetButton.controlSize = .small
@@ -297,28 +291,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func resetLyricsPosition() { placement.reset() }
     @objc private func toggleKeepAwake() { settings.keepScreenAwake.toggle() }
     @objc private func toggleShowWhenUnlocked() { settings.showWhenUnlocked.toggle() }
-    /// Every change redraws each visible style, so while dragging the size is applied at most `scaleStep` apart, and the
-    /// exact value on release. Applying every tick could make the slider stutter or seem stuck.
-    @objc private func textScaleChanged(_ sender: NSSlider) {
-        pendingScale = sender.doubleValue
-        if NSApp.currentEvent?.type == .leftMouseUp {
-            applyPendingScale()
-        } else if !scaleQueued {
-            scaleQueued = true
-            perform(#selector(applyPendingScale), with: nil, afterDelay: Self.scaleStep, inModes: [.eventTracking, .default])
-        }
-    }
-
-    @objc private func applyPendingScale() {
-        scaleQueued = false
-        guard let scale = pendingScale else { return }
-        pendingScale = nil
-        if settings.textScale != scale { settings.textScale = scale }
-    }
 
     @objc private func resetTextScale() {
         settings.textScale = 1
-        textScaleSlider?.doubleValue = 1
+        textScaleSlider?.value = 1
     }
 
     @objc private func toggleDisplay(_ sender: NSMenuItem) {

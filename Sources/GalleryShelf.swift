@@ -23,7 +23,7 @@ struct GalleryShelf: View {
                     GalleryTile(style: style, still: stills.images[style], browsed: model.browsed == style,
                                 inUse: settings.style == style, pinned: settings.pinnedStyles.contains(style),
                                 stillOnly: model.tilesStillOnly, hover: model.hover, settings: settings,
-                                action: { onPick(style) }, onPin: { settings.togglePin(style) })
+                                action: { onPick(style) }, onPin: { settings.togglePin(style) }, live: model.live)
                 }
             }
             CreditLine(hover: model.hover).padding(.top, 14)
@@ -55,6 +55,7 @@ struct GalleryTile: View {
     let settings: AppSettings
     let action: () -> Void
     let onPin: () -> Void
+    var live: LivePreviewSource?
 
     var body: some View {
         let hovered = hover.tile == style
@@ -93,7 +94,8 @@ struct GalleryTile: View {
             .overlay {
                 if playing {
                     GeometryReader { geometry in
-                        TileScene(demo: StyleDemo(style: style, playingSince: hover.playingSince), size: geometry.size, settings: settings)
+                        TileScene(demo: StyleDemo(style: style, playingSince: hover.playingSince), size: geometry.size, settings: settings,
+                                  live: live)
                     }
                     .transition(.opacity)
                 }

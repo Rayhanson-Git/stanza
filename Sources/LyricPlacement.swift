@@ -1,10 +1,10 @@
 import AppKit
 
-/// "Move Lyrics": a small card stands in for the lyrics on the menu-bar display and is dragged to where they should sit.
+/// "Drag Position": a small card stands in for the lyrics on the menu-bar display and is dragged to where they should sit.
 /// Each move is saved at once, as a fraction of the screen, so the lyrics follow on every display and on the lock
 /// screen. The full-screen lyrics layer stays click-through throughout, so the rest of the screen keeps working.
 final class LyricPlacement: NSObject, NSWindowDelegate {
-    private static let cardSize = NSSize(width: 340, height: 112)
+    private static let cardSize = NSSize(width: 340, height: 150)
 
     private let settings: AppSettings
     private var panel: NSPanel?
@@ -28,13 +28,14 @@ final class LyricPlacement: NSObject, NSWindowDelegate {
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.hidesOnDeactivate = false
         panel.isReleasedWhenClosed = false
-        panel.contentView = PlacementCard(frame: NSRect(origin: .zero, size: Self.cardSize),
+        panel.contentView = PlacementCard(frame: NSRect(origin: .zero, size: Self.cardSize), scale: settings.textScale,
+                                          onScale: { [weak self] in self?.settings.textScale = $0 },
                                           done: { [weak self] in self?.end() }, reset: { [weak self] in self?.reset() })
         self.panel = panel
         place(panel, on: screen)
         panel.delegate = self
         panel.orderFrontRegardless()
-        log("move lyrics: on")
+        log("drag position: on")
     }
 
     /// Ends moving; the position is already saved.
@@ -43,7 +44,7 @@ final class LyricPlacement: NSObject, NSWindowDelegate {
         panel.delegate = nil
         panel.orderOut(nil)
         self.panel = nil
-        log("move lyrics: off at \(settings.lyricOffset)")
+        log("drag position: off at \(settings.lyricOffset)")
     }
 
     /// Back to the middle, with or without the card showing.
@@ -72,13 +73,13 @@ final class LyricPlacement: NSObject, NSWindowDelegate {
     }
 }
 
-/// The card: drag it anywhere by its body; Done and Reset Position act on the first click, even while Stanza is
-/// not the active app.
+/// The card: drag it anywhere by its body; the size slider, Done and Reset Position act on the first click, even while
+/// Stanza is not the active app.
 private final class PlacementCard: NSView {
     private let done: () -> Void
     private let reset: () -> Void
 
-    init(frame: NSRect, done: @escaping () -> Void, reset: @escaping () -> Void) {
+    init(frame: NSRect, scale: Double, onScale: @escaping (Double) -> Void, done: @escaping () -> Void, reset: @escaping () -> Void) {
         self.done = done
         self.reset = reset
         super.init(frame: frame)
@@ -93,10 +94,17 @@ private final class PlacementCard: NSView {
         let buttons = NSStackView(views: [FirstClickButton(title: "Reset Position", target: self, action: #selector(resetClicked)),
                                           FirstClickButton(title: "Done", target: self, action: #selector(doneClicked))])
         buttons.spacing = 8
-        let stack = NSStackView(views: [title, hint, buttons])
+        let slider = SizeSlider(frame: NSRect(x: 0, y: 0, width: 200, height: 22), value: scale, range: AppSettings.textScaleRange,
+                                onChange: onScale)
+        slider.translatesAutoresizingMaskIntoConstraints = false
+        slider.widthAnchor.constraint(equalToConstant: 200).isActive = true
+        let sizeRow = NSStackView(views: [Self.label("Size", size: 12, weight: .medium, alpha: 0.85), slider])
+        sizeRow.spacing = 10
+        let stack = NSStackView(views: [title, hint, sizeRow, buttons])
         stack.orientation = .vertical
         stack.spacing = 6
         stack.setCustomSpacing(12, after: hint)
+        stack.setCustomSpacing(12, after: sizeRow)
         stack.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stack)
         NSLayoutConstraint.activate([stack.centerXAnchor.constraint(equalTo: centerXAnchor),
@@ -113,10 +121,10 @@ private final class PlacementCard: NSView {
         return label
     }
 
-    /// Everything but the buttons drags the card.
+    /// Everything but the buttons and the slider drags the card.
     override func hitTest(_ point: NSPoint) -> NSView? {
         let hit = super.hitTest(point)
-        return hit is NSButton ? hit : (hit == nil ? nil : self)
+        return hit is NSButton || hit is SizeSlider ? hit : (hit == nil ? nil : self)
     }
 
     override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }

@@ -55,7 +55,7 @@ What you get:
 
 ## Status and limits
 
-Version 0.3.5. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+Version 0.3.6. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
 source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
@@ -143,6 +143,7 @@ Other details:
 - With macOS "Reduce motion" on, styles drop their decorative wobble.
 - The overlay steps aside on the display where the Stanza window is open, so lyrics never play over their own previews.
 - When the music has been paused for 10 seconds the lyrics fade away; they come back as soon as it plays.
+- While a song with lyrics plays, the window's previews show that song in time with the music; otherwise they play a built-in demo.
 - A short first-run introduction in the window covers the player, the permission and the choice of style.
 
 ## Install
@@ -195,7 +196,7 @@ The menu-bar icon is the logo mark. Its menu has:
 - **Styles**: every style, grouped as Kinetic type, Motion scenes and Phone screens, with any pinned styles first.
   The style in use is ticked.
 - **Keep Screen Awake** and **Show When Unlocked**
-- **Move Lyrics**: shows a card to drag the lyrics anywhere on screen; **Reset Lyrics Position** puts them back in the middle
+- **Drag Position**: shows a card to drag the lyrics anywhere on screen, with a size slider on it; **Reset Position** puts them back in the middle
 - **Size**: a slider for the size of the whole style, with a Reset button
 - **Displays**: one item per connected display, to turn the lyrics on or off there
 - **Check for Updates…**, which reads **Restart to Update** while a downloaded update waits
