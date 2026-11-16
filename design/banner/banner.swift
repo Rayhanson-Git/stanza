@@ -63,7 +63,7 @@ struct Banner: View {
                     Text("Time-synced lyrics, word by word, on your Mac's desktop and lock screen.")
                         .font(.system(size: layout.tagline, weight: .medium)).foregroundStyle(Palette.lightTeal)
                     HStack(spacing: 10) {
-                        Text("13 styles")
+                        Text("23 styles")
                         Circle().fill(Palette.crimson).frame(width: 6, height: 6)
                         Text("Spotify and Apple Music")
                         Circle().fill(Palette.crimson).frame(width: 6, height: 6)
