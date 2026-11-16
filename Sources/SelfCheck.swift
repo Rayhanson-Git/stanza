@@ -98,6 +98,17 @@ func runSelfCheck() {
 
     for failure in gallerySelfCheck() { check(false, failure) }
 
+    // Lettering: South Asian scripts and Urdu are recognised, Arabic, Chinese and English are not; Roman means Latin.
+    check(LyricsScript.isSouthAsian("तुम ही हो") && LyricsScript.isSouthAsian("আমার সোনার বাংলা") && LyricsScript.isSouthAsian("دل ہے")
+          && !LyricsScript.isSouthAsian("قلبي") && !LyricsScript.isSouthAsian("我爱你") && !LyricsScript.isSouthAsian("tum hi ho"),
+          "lyrics script: South Asian scripts and Urdu are told apart from the rest")
+    check(LyricsScript.isRoman("[00:19.00] Kevain tenu mei dikhaawan") && LyricsScript.isRoman("Dil hai, chhota sa")
+          && !LyricsScript.isRoman("तुम ही हो") && !LyricsScript.isRoman("আমার সোনার") && !LyricsScript.isRoman("[00:01.00]"),
+          "lyrics script: English-letter versions are recognised")
+    check(LyricsScript.joinsLetters("আমার") && LyricsScript.joinsLetters("तुम") && LyricsScript.joinsLetters("دل")
+          && !LyricsScript.joinsLetters("harbour") && !LyricsScript.joinsLetters("我爱你"),
+          "lyrics script: joined scripts are kept whole, separate letters are not")
+
     // Moving the lyrics: any move on screen or a little past an edge is kept, a wild one stops half a screen out, and
     // zero stays the middle.
     let corner = Layout.clampedOffset(CGPoint(x: -0.55, y: -0.6))

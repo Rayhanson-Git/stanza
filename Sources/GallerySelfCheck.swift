@@ -66,11 +66,14 @@ private func pinAndLayoutChecks() -> [String] {
     checks.check(AppSettings.rawPins(pins) == ["Ship", "Web"] && AppSettings.pins(from: AppSettings.rawPins(pins) + ["No Such Style"]) == pins,
                  "pins round-trip through their stored names, unknown names dropped")
     checks.check(AppSettings.pins(from: []).isEmpty, "nothing is pinned by default")
-    let pinnedMenu = AppSettings.menuGroups(pinned: pins), plainMenu = AppSettings.menuGroups(pinned: [])
-    checks.check(pinnedMenu.first?.title == "Pinned" && pinnedMenu.first?.styles == [.ship, .web]
+    let favouriteMenu = AppSettings.menuGroups(favourites: pins, current: .web)
+    let otherInUse = AppSettings.menuGroups(favourites: pins, current: .map)
+    let plainMenu = AppSettings.menuGroups(favourites: [], current: .ship)
+    checks.check(favouriteMenu.map(\.title) == ["Favourites"] && favouriteMenu[0].styles == [.ship, .web]
+                 && otherInUse.map(\.title) == ["Favourites", "In Use"] && otherInUse[1].styles == [.map]
                  && plainMenu.map(\.title) == ["Kinetic type", "Motion scenes", "Phone screens"]
                  && plainMenu.flatMap(\.styles) == LyricStyle.allCases,
-                 "the menu lists every style by category, with pinned styles first when there are any")
+                 "the menu lists only favourites (and the style in use) when there are any, else every style by category")
 
     let styles = LyricStyle.allCases
     checks.check(GalleryModel.stepped(from: .ship, by: -1) == styles.last && GalleryModel.stepped(from: styles.last!, by: 1) == .ship

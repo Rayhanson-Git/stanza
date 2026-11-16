@@ -226,8 +226,8 @@ struct PanelNote: View {
     }
 }
 
-/// Keeps a style in, or takes it out of, the status-bar menu.
-struct PinButton: View {
+/// Stars a style as a favourite, or unstars it; favourites are what the menu bar menu lists.
+struct FavouriteButton: View {
     static let tileSize: CGFloat = 28
     static let heroSize: CGFloat = 44
     private static let glyphScale = 0.42
@@ -238,9 +238,9 @@ struct PinButton: View {
     let action: () -> Void
 
     var body: some View {
-        let title = pinned ? "Unpin from the menu bar" : "Pin to the menu bar"
+        let title = pinned ? "Remove from Favourites" : "Add to Favourites (they show in the menu bar menu)"
         Button(action: action) {
-            Image(systemName: pinned ? "pin.fill" : "pin")
+            Image(systemName: pinned ? "star.fill" : "star")
                 .font(.system(size: size * Self.glyphScale, weight: .semibold))
                 .foregroundStyle(pinned ? .black : .white)
                 .frame(width: size, height: size)

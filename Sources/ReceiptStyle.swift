@@ -57,14 +57,34 @@ private struct TillPlacement {
     let word: Int, row: Int, column: Int
     /// Where this piece starts within its word.
     let offset: Int
-    let glyphs: [Character]
+    /// One letter each, or a whole word in a script whose letters join, followed by blanks for the rest of its width.
+    let glyphs: [String]
+}
+
+/// How many monospaced columns a whole word covers in the receipt's type.
+/// Measured once per word: the receipt is laid out on every frame.
+@MainActor private var tillSpans: [String: Int] = [:]
+
+private func tillSpan(of word: String) -> Int {
+    if let known = MainActor.assumeIsolated({ tillSpans[word] }) { return known }
+    let size: CGFloat = 100
+    let font = NSFont.monospacedSystemFont(ofSize: size, weight: .medium)
+    let width = NSAttributedString(string: word, attributes: [.font: font]).size().width
+    let span = max(1, Int((width / (TillMetrics.advance * size)).rounded(.up)))
+    MainActor.assumeIsolated {
+        if tillSpans.count > 512 { tillSpans.removeAll() }
+        tillSpans[word] = span
+    }
+    return span
 }
 
 /// Greedy word wrap onto rows `columns` characters wide; a word longer than a row is broken across rows.
 private func tillWrap(_ words: [TimedWord], columns: Int) -> (placements: [TillPlacement], rows: Int) {
     var placements = [TillPlacement](), row = 0, column = 0
     for (index, word) in words.enumerated() {
-        let glyphs = Array(word.text)
+        let glyphs: [String] = LyricsScript.joinsLetters(word.text)
+            ? [word.text] + Array(repeating: "", count: tillSpan(of: word.text) - 1)
+            : word.text.map(String.init)
         var start = 0
         while start < glyphs.count {
             let chunk = Array(glyphs[start..<min(start + columns, glyphs.count)])
@@ -171,7 +191,7 @@ private struct TillReceipt {
         var cursor = headerBottom + min(content, room)
         graphics.drawLayer { layer in
             layer.clip(to: Path(lyricArea).intersection(paper))
-            var cache = [Character: GraphicsContext.ResolvedText]()
+            var cache = [String: GraphicsContext.ResolvedText]()
             for row in rows {
                 let top = cursor - row.height * fed(row)
                 cursor = top
@@ -305,7 +325,7 @@ private struct TillReceipt {
     // MARK: Rows
 
     private func drawLyricRow(line index: Int, row: Int, top: CGFloat, textLeft: CGFloat, font: CGFloat,
-                              cache: inout [Character: GraphicsContext.ResolvedText], in graphics: GraphicsContext) {
+                              cache: inout [String: GraphicsContext.ResolvedText], in graphics: GraphicsContext) {
         let m = TillMetrics.self
         let words = context.lyrics.lines[index]
         let wrapped = tillWrap(words, columns: m.textColumns)
@@ -319,11 +339,12 @@ private struct TillReceipt {
         }
         guard index == context.line.index else {
             // Finished lines are drawn a row at a time, at the same advance as the letters printed one by one.
-            var text = [Character](repeating: " ", count: m.textColumns)
+            var text = [String](repeating: " ", count: m.textColumns)
             for placement in placements {
-                for (offset, glyph) in placement.glyphs.enumerated() { text[placement.column + offset] = glyph }
+                // The blanks after a whole joined word stay spaces, so later words keep their columns.
+                for (offset, glyph) in placement.glyphs.enumerated() where !glyph.isEmpty { text[placement.column + offset] = glyph }
             }
-            let string = String(text).replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
+            let string = text.joined().replacingOccurrences(of: "\\s+$", with: "", options: .regularExpression)
             graphics.draw(Text(string).font(body).foregroundStyle(TillPaint.ink.opacity(m.olderInk)),
                           at: CGPoint(x: textLeft, y: top), anchor: .topLeading)
             return
@@ -332,7 +353,7 @@ private struct TillReceipt {
             let word = words[placement.word]
             let count = word.text.count
             let span = min(max(0, word.end - word.start), m.longestPrint)
-            for (offset, glyph) in placement.glyphs.enumerated() where !glyph.isWhitespace {
+            for (offset, glyph) in placement.glyphs.enumerated() where !glyph.trimmingCharacters(in: .whitespaces).isEmpty {
                 let place = placement.offset + offset
                 let printed = word.start + span * Double(place) / Double(max(1, count))
                 let age = time - printed
@@ -341,7 +362,7 @@ private struct TillReceipt {
                 if let cached = cache[glyph] {
                     text = cached
                 } else {
-                    text = graphics.resolve(Text(String(glyph)).font(body).foregroundStyle(TillPaint.ink))
+                    text = graphics.resolve(Text(glyph).font(body).foregroundStyle(TillPaint.ink))
                     cache[glyph] = text
                 }
                 var point = CGPoint(x: textLeft + CGFloat(placement.column + offset) * step, y: top)

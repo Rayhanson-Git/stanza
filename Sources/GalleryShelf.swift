@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// "All styles": every style as a tile, in one adaptive grid under the hero.
+/// Under the hero: the favourites (the styles the menu bar menu lists), then every style, as tiles in adaptive grids.
 struct GalleryShelf: View {
     private enum Metrics {
         static let tileWidth: ClosedRange<CGFloat> = 232...380
@@ -16,15 +16,24 @@ struct GalleryShelf: View {
     var body: some View {
         let columns = [GridItem(.adaptive(minimum: Metrics.tileWidth.lowerBound, maximum: Metrics.tileWidth.upperBound),
                                 spacing: Metrics.columnSpacing)]
+        let favourites = LyricStyle.allCases.filter(settings.favouriteStyles.contains)
         VStack(alignment: .leading, spacing: 18) {
-            Text("All styles").font(.system(size: 22, weight: .semibold)).foregroundStyle(.white)
-            LazyVGrid(columns: columns, alignment: .leading, spacing: Metrics.rowSpacing) {
-                ForEach(LyricStyle.allCases, id: \.self) { style in
-                    GalleryTile(style: style, still: stills.images[style], browsed: model.browsed == style,
-                                inUse: settings.style == style, pinned: settings.pinnedStyles.contains(style),
-                                stillOnly: model.tilesStillOnly, hover: model.hover, settings: settings,
-                                action: { onPick(style) }, onPin: { settings.togglePin(style) }, live: model.live)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Favourites").font(.system(size: 22, weight: .semibold)).foregroundStyle(.white)
+                Text(favourites.isEmpty
+                     ? "Star a style to add it here. Favourites are what the menu bar menu shows."
+                     : "These are the styles in your menu bar menu.")
+                    .font(.system(size: 13)).foregroundStyle(.white.opacity(0.6))
+            }
+            if !favourites.isEmpty {
+                LazyVGrid(columns: columns, alignment: .leading, spacing: Metrics.rowSpacing) {
+                    ForEach(favourites, id: \.self) { tile($0, playable: true) }
                 }
+            }
+            Text("All styles").font(.system(size: 22, weight: .semibold)).foregroundStyle(.white).padding(.top, 18)
+            LazyVGrid(columns: columns, alignment: .leading, spacing: Metrics.rowSpacing) {
+                // A favourite plays in its Favourites tile only, not twice at once.
+                ForEach(LyricStyle.allCases, id: \.self) { tile($0, playable: !settings.favouriteStyles.contains($0)) }
             }
             CreditLine(hover: model.hover).padding(.top, 14)
         }
@@ -33,6 +42,13 @@ struct GalleryShelf: View {
         .padding(.bottom, 52)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.black)
+    }
+
+    private func tile(_ style: LyricStyle, playable: Bool) -> some View {
+        GalleryTile(style: style, still: stills.images[style], browsed: model.browsed == style,
+                    inUse: settings.style == style, pinned: settings.favouriteStyles.contains(style),
+                    stillOnly: model.tilesStillOnly || !playable, hover: model.hover, settings: settings,
+                    action: { onPick(style) }, onPin: { settings.toggleFavourite(style) }, live: model.live)
     }
 }
 
@@ -73,7 +89,7 @@ struct GalleryTile: View {
         .buttonStyle(.plain)
         .overlay(alignment: .topLeading) {
             if hovered || pinned {
-                PinButton(pinned: pinned, size: PinButton.tileSize, action: onPin).padding(Metrics.inset).transition(.opacity)
+                FavouriteButton(pinned: pinned, size: FavouriteButton.tileSize, action: onPin).padding(Metrics.inset).transition(.opacity)
             }
         }
         .animation(.easeOut(duration: 0.15), value: hovered)

@@ -88,8 +88,10 @@ final class AppSettings: ObservableObject {
     /// Map style: make the whole display the map, or keep it a rounded window.
     @Published var mapFillsDisplay: Bool { didSet { defaults.set(mapFillsDisplay, forKey: Key.mapFillsDisplay) } }
     /// Styles kept in the status-bar menu for quick switching. No limit on how many.
-    @Published private(set) var pinnedStyles: Set<LyricStyle> {
-        didSet { defaults.set(Self.rawPins(pinnedStyles), forKey: Key.pinnedStyles) }
+    /// Starred styles: the menu bar menu lists only these when there are any. Stored under the old "pinned" key, so
+    /// styles pinned before Favourites existed carry over.
+    @Published private(set) var favouriteStyles: Set<LyricStyle> {
+        didSet { defaults.set(Self.rawPins(favouriteStyles), forKey: Key.pinnedStyles) }
     }
     /// Where the lyrics were moved to, as a fraction of the screen away from the middle (Move Lyrics in the menu).
     /// Set it through `Layout.clampedOffset` so the lyrics can never be lost off screen.
@@ -138,7 +140,7 @@ final class AppSettings: ObservableObject {
         mapFillsDisplay = bool(Key.mapFillsDisplay, default: false)
         autoSyncColors = bool(Key.autoSyncColors, default: false)
         disabledDisplays = Set((defaults.stringArray(forKey: Key.disabledDisplays) ?? []).compactMap(UInt32.init))
-        pinnedStyles = Self.pins(from: defaults.stringArray(forKey: Key.pinnedStyles) ?? [])
+        favouriteStyles = Self.pins(from: defaults.stringArray(forKey: Key.pinnedStyles) ?? [])
         onboardingDone = bool(Key.onboardingDone, default: false)
         lyricOffset = Layout.clampedOffset(CGPoint(x: defaults.double(forKey: Key.lyricOffsetX), y: defaults.double(forKey: Key.lyricOffsetY)))
         reloadStoredColors()
@@ -188,7 +190,7 @@ final class AppSettings: ObservableObject {
         log("display \(id) → \(disabledDisplays.contains(id) ? "off" : "on")")
     }
 
-    // MARK: Pinned styles
+    // MARK: Favourite styles
 
     static func pins(from names: [String]) -> Set<LyricStyle> { Set(names.compactMap(LyricStyle.init(rawValue:))) }
 
@@ -197,20 +199,23 @@ final class AppSettings: ObservableObject {
 
     static func togglingPin(_ style: LyricStyle, in pins: Set<LyricStyle>) -> Set<LyricStyle> { pins.symmetricDifference([style]) }
 
-    /// What the status-bar menu lists: every style, grouped as in the window, with any pinned styles
-    /// repeated in a short group at the top for quick switching.
-    static func menuGroups(pinned: Set<LyricStyle>) -> [(title: String, styles: [LyricStyle])] {
-        let pinnedGroup = LyricStyle.allCases.filter(pinned.contains)
+    /// What the status-bar menu lists. With favourites, only those, plus the style in use when it is not one of them,
+    /// so the menu stays short however many styles there are. With none yet, every style, grouped as in the window.
+    static func menuGroups(favourites: Set<LyricStyle>, current: LyricStyle) -> [(title: String, styles: [LyricStyle])] {
+        let favouriteGroup = LyricStyle.allCases.filter(favourites.contains)
+        guard favouriteGroup.isEmpty else {
+            return [(title: "Favourites", styles: favouriteGroup)] + (favourites.contains(current) ? [] : [(title: "In Use", styles: [current])])
+        }
         let categories = LyricStyle.allCases.map(\.category).reduce(into: [String]()) { order, category in
             if !order.contains(category) { order.append(category) }
         }
         let byCategory = categories.map { category in (title: category, styles: LyricStyle.allCases.filter { $0.category == category }) }
-        return (pinnedGroup.isEmpty ? [] : [(title: "Pinned", styles: pinnedGroup)]) + byCategory
+        return byCategory
     }
 
-    func togglePin(_ style: LyricStyle) {
-        pinnedStyles = Self.togglingPin(style, in: pinnedStyles)
-        log("pin \(style.rawValue) → \(pinnedStyles.contains(style) ? "on" : "off")")
+    func toggleFavourite(_ style: LyricStyle) {
+        favouriteStyles = Self.togglingPin(style, in: favouriteStyles)
+        log("favourite \(style.rawValue) → \(favouriteStyles.contains(style) ? "on" : "off")")
     }
 
     private func reloadStoredColors() {

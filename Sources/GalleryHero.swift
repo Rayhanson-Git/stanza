@@ -154,8 +154,8 @@ struct GalleryHeroControls: View {
             Text(style.summary).font(.system(size: 14.5)).foregroundStyle(.white.opacity(0.74)).padding(.top, 7)
             HStack(spacing: 10) {
                 mainAction(style)
-                PinButton(pinned: settings.pinnedStyles.contains(style), size: PinButton.heroSize, glass: true) {
-                    settings.togglePin(style)
+                FavouriteButton(pinned: settings.favouriteStyles.contains(style), size: FavouriteButton.heroSize, glass: true) {
+                    settings.toggleFavourite(style)
                 }
                 if style == .map { mapToggles }
             }

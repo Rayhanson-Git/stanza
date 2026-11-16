@@ -56,7 +56,7 @@ What you get:
 
 ## Status and limits
 
-Version 0.4.0. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+Version 0.4.1. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
 source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
@@ -150,7 +150,7 @@ runs through `LyricStage`, the same view that draws the real overlay, so what yo
 Other details:
 
 - The Map style can lean the city over in 3D or look straight down, and can fill the display or sit in a window.
-- Styles can be pinned; pinned styles are listed first in the menu-bar menu.
+- Styles can be starred as Favourites. Once there are any, the menu-bar menu lists only those, so it stays short.
 - With macOS "Reduce motion" on, styles drop their decorative wobble.
 - The overlay steps aside on the display where the Stanza window is open, so lyrics never play over their own previews.
 - When the music has been paused for 10 seconds the lyrics fade away; they come back as soon as it plays.
@@ -196,7 +196,7 @@ to `/Applications` first if you prefer.
 
 The window opens when Stanza starts and whenever you choose **Open Stanza** from the menu-bar icon. While it is open,
 Stanza also has a Dock icon. Use the arrows or the dots to browse the styles in the large preview, **Select** to use
-one, and the pin button to keep it at the top of the menu-bar menu. The panels across the top hold the settings; the
+one, and the star to make it a Favourite; Favourites have their own row above all the styles. The panels across the top hold the settings; the
 player icons at the top right open the Spotify and Apple Music panels, and the gear beside them opens Settings.
 
 ### The menu bar
@@ -204,8 +204,8 @@ player icons at the top right open the Spotify and Apple Music panels, and the g
 The menu-bar icon is the logo mark. Its menu has:
 
 - **Open Stanza**
-- **Styles**: every style, grouped as Kinetic type, Motion scenes and Phone screens, with any pinned styles first.
-  The style in use is ticked.
+- **Styles**: your Favourites (and the style in use) with **All Styles…** to open the window; with no Favourites yet, every
+  style, grouped as Kinetic type, Motion scenes and Phone screens. The style in use is ticked.
 - **Keep Screen Awake** and **Show When Unlocked**
 - **Position and Size**: **Drag Position** shows a card to drag the lyrics anywhere on screen, with a size slider on it; **Reset Position** puts them back in the middle; the **Size** slider scales the whole style, with **Reset Size**
 - **Displays**: one item per connected display, to turn the lyrics on or off there

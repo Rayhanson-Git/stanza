@@ -236,9 +236,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
     }
 
-    /// Every style, grouped as in the window, the one in use ticked; pinned styles also lead in their own group.
+    /// The favourites (or, with none yet, every style by group), the one in use ticked, then a way to the rest.
     private func styleItems() -> [NSMenuItem] {
-        let items = AppSettings.menuGroups(pinned: settings.pinnedStyles).flatMap { group -> [NSMenuItem] in
+        let favourites = settings.favouriteStyles
+        var items = AppSettings.menuGroups(favourites: favourites, current: settings.style).flatMap { group -> [NSMenuItem] in
             let styles = group.styles.map { style -> NSMenuItem in
                 let styleItem = item(style.rawValue, #selector(pickStyle(_:)), represented: style.rawValue)
                 styleItem.state = style == settings.style ? .on : .off
@@ -247,8 +248,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             }
             return [header(group.title)] + styles
         }
+        if favourites.isEmpty {
+            items.append(note("Star styles in the Stanza window to list only your favourites here."))
+        } else {
+            let all = item("All Styles…", #selector(showGallery))
+            all.indentationLevel = 1
+            items.append(all)
+        }
         items.forEach { $0.tag = Tag.style }
         return items
+    }
+
+    /// A line of small grey help text in the menu.
+    private func note(_ text: String) -> NSMenuItem {
+        let note = NSMenuItem(title: text, action: nil, keyEquivalent: "")
+        note.attributedTitle = NSAttributedString(string: text, attributes: [
+            .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize), .foregroundColor: NSColor.secondaryLabelColor])
+        note.isEnabled = false
+        note.indentationLevel = 1
+        return note
     }
 
     private func header(_ title: String) -> NSMenuItem {

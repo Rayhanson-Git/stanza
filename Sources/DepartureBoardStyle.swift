@@ -35,7 +35,7 @@ private enum FlapMetrics {
     static let window = maxDelay + delayJitter + step * Double(maxSpins + 1)
     static let fadeIn = 0.2, fadeOut = 0.3
     static let before = 1e-6
-    static let spinGlyphs = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    static let spinGlyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".map(String.init)
 }
 
 private enum FlapSalt {
@@ -45,14 +45,15 @@ private enum FlapSalt {
 private enum FlapTone: Hashable { case departed, current, singing }
 
 private struct FlapCell {
-    let glyph: Character
+    /// One letter, or a whole word in a script whose letters join (it spans the tiles after it, which stay blank).
+    let glyph: String
     let tone: FlapTone
 }
 
 /// One word, or one row-wide piece of a word too long for a row, placed on the grid.
 private struct FlapPlacement {
     let word: Int, row: Int, column: Int
-    let glyphs: [Character]
+    let glyphs: [String]
 }
 
 /// A tile turning from one glyph to another through a few random ones.
@@ -79,11 +80,31 @@ private struct FlapState {
     let progress: Double
 }
 
+/// How many tiles a whole word covers in the board's glyph font (one tile pitch is 1 / glyphSize of the font size).
+/// Measured once per word: the board is laid out on every frame.
+@MainActor private var flapSpans: [String: Int] = [:]
+
+private func flapSpan(of word: String) -> Int {
+    if let known = MainActor.assumeIsolated({ flapSpans[word] }) { return known }
+    let size: CGFloat = 100
+    let font = NSFont.systemFont(ofSize: size * FlapMetrics.glyphSize, weight: .bold, width: .condensed)
+    let width = NSAttributedString(string: word, attributes: [.font: font]).size().width
+    let span = max(1, Int((width / size).rounded(.up)))
+    MainActor.assumeIsolated {
+        if flapSpans.count > 512 { flapSpans.removeAll() }
+        flapSpans[word] = span
+    }
+    return span
+}
+
 /// Greedy word wrap onto rows of `columns` tiles; a word longer than a row is broken across rows.
 private func flapWrap(_ words: [TimedWord], columns: Int) -> (placements: [FlapPlacement], rows: Int) {
     var placements = [FlapPlacement](), row = 0, column = 0
     for (index, word) in words.enumerated() {
-        let glyphs = Array(word.text.uppercased())
+        // Joined scripts keep the word whole in its first tile and leave blank as many tiles as it really covers.
+        let glyphs: [String] = LyricsScript.joinsLetters(word.text)
+            ? [word.text] + Array(repeating: "", count: flapSpan(of: word.text) - 1)
+            : word.text.uppercased().map(String.init)
         var start = 0
         while start < glyphs.count {
             let chunk = Array(glyphs[start..<min(start + columns, glyphs.count)])
@@ -131,7 +152,10 @@ private struct FlapBoard {
                     before = Self.grid(lines, line: index, at: change - FlapMetrics.before).cells
                 }
                 let after = Self.grid(lines, line: index, at: change).cells
-                let changed = after.indices.filter { before[$0]?.glyph != after[$0]?.glyph }
+                // A whole joined word does not spin through letters; it simply appears.
+                let changed = after.indices.filter {
+                    before[$0]?.glyph != after[$0]?.glyph && (after[$0]?.glyph.count ?? 0) <= 1 && (before[$0]?.glyph.count ?? 0) <= 1
+                }
                 let firstColumn = changed.map { $0 % FlapMetrics.columns }.min() ?? 0
                 for cell in changed {
                     flips[cell] = Self.flip(cell: cell, line: index, change: change, firstColumn: firstColumn,
@@ -185,7 +209,7 @@ private struct FlapBoard {
     }
 
     private static func put(_ placement: FlapPlacement, row: Int, tone: FlapTone, into cells: inout [FlapCell?]) {
-        for (offset, glyph) in placement.glyphs.enumerated() where !glyph.isWhitespace {
+        for (offset, glyph) in placement.glyphs.enumerated() where !glyph.trimmingCharacters(in: .whitespaces).isEmpty {
             cells[row * FlapMetrics.columns + placement.column + offset] = FlapCell(glyph: glyph, tone: tone)
         }
     }
@@ -239,7 +263,12 @@ private struct FlapBoard {
         for cell in 0..<cells.count where moving[cell] == nil {
             guard let content = shown[cell] else { continue }
             let tile = geometry.tile(cell)
-            graphics.draw(glyphs.text(content.glyph, tone: content.tone), at: CGPoint(x: tile.midX, y: tile.midY))
+            let text = glyphs.text(content.glyph, tone: content.tone)
+            if content.glyph.count > 1 {
+                graphics.draw(text, at: CGPoint(x: tile.minX, y: tile.midY), anchor: .leading)
+            } else {
+                graphics.draw(text, at: CGPoint(x: tile.midX, y: tile.midY))
+            }
         }
         for (cell, state) in moving {
             drawFlip(state, tile: geometry.tile(cell), geometry: geometry, glyphs: &glyphs, in: graphics)
@@ -376,7 +405,7 @@ private struct FlapGlyphs {
         self.graphics = graphics
     }
 
-    mutating func text(_ glyph: Character, tone: FlapTone) -> GraphicsContext.ResolvedText {
+    mutating func text(_ glyph: String, tone: FlapTone) -> GraphicsContext.ResolvedText {
         let key = "\(tone)\(glyph)"
         if let text = resolved[key] { return text }
         let ink: Color
@@ -385,7 +414,7 @@ private struct FlapGlyphs {
         case .current: ink = FlapPaint.amber
         case .singing: ink = FlapPaint.hot
         }
-        let text = graphics.resolve(Text(String(glyph)).font(font).foregroundStyle(ink))
+        let text = graphics.resolve(Text(glyph).font(font).foregroundStyle(ink))
         resolved[key] = text
         return text
     }

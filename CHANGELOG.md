@@ -2,6 +2,13 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.1
+
+- **Favourites** replace pins. Star a style in the window (on the big preview or a tile) and it joins a new Favourites row above all the styles. Once you have favourites, the menu bar menu lists only those, plus the style in use and **All Styles…**, so it stays short. Anything you had pinned is already a favourite.
+- Hindi, Urdu, Punjabi and Bengali songs now show their lyrics in English letters whenever a version in English letters exists (for example "Mujhko itna bataaye koi"). If none does, the original script is shown as it is.
+- Lyrics are found for more songs: when the lyrics database knows a song under a slightly different artist name (say "Maanu" for "Maanu, Annural Khalid"), Stanza still finds it. Songs looked up before are checked once more.
+- Departure Board and Receipt now draw Bengali, Hindi, Urdu and other joined scripts correctly, keeping each word whole.
+
 ## 0.4.0
 
 - Ten new styles, for 23 in all:
