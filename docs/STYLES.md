@@ -9,6 +9,7 @@
 <p align="center">
   <a href="../README.md">README</a> |
   <a href="ARCHITECTURE.md">Architecture</a> |
+  <a href="DESIGN.md">Design</a> |
   <a href="#kinetic-type">Kinetic type</a> |
   <a href="#motion-scenes">Motion scenes</a> |
   <a href="#phone-screens">Phone screens</a>
@@ -17,6 +18,10 @@
 Stanza draws the words of a song in one of 23 styles, chosen in the window or from the menu-bar menu. This page
 covers them in the order the window shows them. Each frame below was drawn by `Stanza --render` with the app's
 invented sample lyrics, at Size 100% in SF Pro, and cropped to the lyric band.
+
+Every style has four parts: **how it plays**, **how it's built**, **why it's designed this way**, and a **design
+theory** note that names the principles it rests on (figure and ground, hierarchy, continuity, rhythm, metaphor) and
+explains its motion. The ideas shared by the whole app are set out in [DESIGN.md](DESIGN.md).
 
 ## Contents
 
@@ -125,6 +130,13 @@ singer leans on are the ones that stand out. The sway gives the text depth witho
 each other, which keeps it easy to read. Indent, tilt and pill are seeded from each word's start time, so a word
 keeps its look for as long as it is on screen.
 
+**Design theory.** *Hierarchy by duration:* size is the strongest visual variable, so it is spent on the one thing
+the singer emphasises, how long a word is held, with a square root so a long note stands out without drowning the
+line. *A fixed point of attention:* the newest word always arrives at the same place (the bottom), so the eye can
+rest there rather than hunt. *Depth without disorder:* the 3D sway moves the whole wall as one rigid object; because
+the words never move relative to one another, the motion reads as space, not as noise. The spring entrance from a
+third of the size gives each word a felt arrival, like a stamp landing, which matches the beat.
+
 **Notes.**
 - Uses your font, the text colour and the highlight colour; black or white text on the pill, whichever contrasts.
 - A dark shadow under every row.
@@ -152,6 +164,12 @@ it to one place. A true lens would bend each glyph; that needs a Metal shader, w
 compile, so the code notes the 3D tip as a deliberate shortcut to upgrade later. Tipping the outer rows gives the
 same sense of curvature at no cost.
 
+**Design theory.** *Focal point and span of attention:* three words is about what can be read in one fixation, and
+the swollen middle gives the stack one obvious centre. *Figure and ground by colour:* only the newest word gets the
+solid highlight block; the others drop to the secondary colour, so "now" and "just now" never compete. *Implied
+form:* tipping the outer rows back 38° suggests a curved lens through perspective alone, the way a drawing suggests a
+sphere with shading. The spring push-up keeps continuity: you see the old words make room rather than vanish.
+
 **Notes.**
 - Uses your font, the highlight colour and the secondary colour.
 - Footprint 0.98. No sway.
@@ -177,6 +195,12 @@ so SwiftUI's opacity transition does the cross-fade.
 Putting the big picture behind the words at low opacity sets a mood for the line while the words stay in front and
 fully legible.
 
+**Design theory.** *Dual coding:* a word read alongside a picture is understood twice, through language and through
+image, so the picture is placed beside the word, never in place of it. *Layered depth:* the large backdrop picture
+at 8% opacity sits far behind the text in both size and contrast, so it colours the mood of the line without ever
+becoming the figure. Its cross-fade, rather than a cut, keeps the background calm while the foreground changes word
+by word. The sway is half of Ship's, because pictures already add movement.
+
 **Notes.**
 - Uses your font, the highlight colour (word block and symbols) and the secondary colour; the backdrop symbol is in
   the text colour.
@@ -197,6 +221,11 @@ adding `WordIcon` to each row.
 
 **Why it's designed this way.** It is offered as its own style, rather than a switch on Fisheye, so that every look
 is one click in the gallery and in the menu, with nothing extra to set.
+
+**Design theory.** *Recognition over configuration:* a combination is offered as its own style rather than an
+option, so it can be found by looking, in the window and in the menu, instead of by knowing a setting exists. The
+pictures follow Visual's rule (beside the word, never instead of it), and the lens keeps Fisheye's single focal
+point, so adding pictures does not add a second place to look.
 
 **Notes.** As Fisheye. Footprint 0.98.
 
@@ -223,6 +252,13 @@ for its widest stretch, so nothing reflows while the line is sung. If a line doe
 **Why it's designed this way.** Singers stretch vowels, and this is the one style that shows it. Reserving the
 stretched width up front keeps the rest of the line still while one word grows, so the eye is never chasing moving
 words. Lines with estimated timing have no real holds to show, so only the end of the line is allowed to stretch.
+
+**Design theory.** *Expressive typography:* the shape of a word follows the sound of it, as in comics and
+concrete poetry, so a held vowel is literally longer. *Stability of layout:* each row reserves the width of its widest
+stretch before the line plays, so only one word ever moves; the rest of the line is a fixed frame for it (the
+Gestalt idea of a stable ground making one change obvious). *Motion that carries meaning:* the pop, rise and recoil
+are flourishes and go with Reduce Motion; the stretch itself stays, because it *is* the information. The warm shift
+toward the highlight colour marks the held part as the important part.
 
 **Notes.**
 - Uses your font, the text colour and the highlight colour. A soft dark shadow under the text.
@@ -254,6 +290,13 @@ font and colours on purpose and brings its own high-contrast pairs, which also k
 wallpaper. Matching cap heights stops a condensed face from looking smaller than a wide one. Everything is seeded
 from the word's start time and place in the line, so a scrap never changes face mid-song.
 
+**Design theory.** *Contrast between neighbours:* a collage only reads as a collage if each scrap differs from
+the one beside it, so typeface and paper are never repeated next to each other. *Optical sizing:* matching cap
+heights rather than point sizes makes every face look the same size, which is how the eye judges it. *Physicality
+for timing:* each scrap falls, squashes and settles, a small piece of animation physics (squash and stretch) that
+makes the moment a word is sung feel like a thing landing. *Readability by construction:* paper and ink come in
+fixed high-contrast pairs, so the style never depends on the wallpaper.
+
 **Notes.**
 - Ignores your font and all three colours; Size still applies.
 - Footprint 0.85.
@@ -281,6 +324,13 @@ glyph as overlapping contours, and the pen should trace only the visible edge. W
 cannot: a long note is a slow hand. Thin, wet strokes would vanish over a bright wallpaper, so a dark halo is applied
 once to the finished layer, not to each shape, which would darken the fills where they overlap.
 
+**Design theory.** *Duration made visible:* the pen takes as long to write a word as the singer takes to sing it,
+so timing becomes speed of hand, a mapping anyone reads without being told. The slight slowing at the end of each
+stroke mimics a real hand easing off. *Progressive reveal:* outline first, then fill, then the colour drying from
+highlight to text colour, three stages that say "being written", "written" and "settled". *Figure and ground:* one
+dark halo over the finished layer keeps thin, wet strokes readable on bright wallpapers without darkening the places
+where letters overlap.
+
 **Notes.**
 - Uses your font, the text colour and the highlight colour.
 - Footprint 1.14.
@@ -306,6 +356,12 @@ threshold. `flow`, `thread`, `sag` and `disc` build the shapes; drips are seeded
 **Why it's designed this way.** Blur-and-threshold gives real surface tension for the price of two filters, with no
 physics. Blur costs by area, so the canvas covers only the text block and the room its drips need, not the whole
 band. The goo is a moment of transition; the words always settle to crisp, shadowed text so they stay readable.
+
+**Design theory.** *Continuity:* each word flows out of the end of the last, so the line reads as one connected
+utterance, as it is sung. *Material honesty of a sort:* blur-and-threshold gives real surface tension, so the goo
+behaves like a liquid without simulating one. *Transition, then rest:* the goo is a moment; within 0.2 s every word
+settles into crisp, shadowed text, so the effect never costs readability. The melt at the end is a clear closing
+gesture: the line is over, and you can see it go.
 
 **Notes.**
 - Uses your font, the text colour and the highlight colour.
@@ -341,6 +397,13 @@ reveals glyphs, not characters, evenly across each word's sung time, tagging eac
 "you are here" marker there is. The blur on the fly-in stands in for a directional motion blur, which needs a Metal
 shader this build cannot compile. Row shapes and colours are seeded, so a line types out the same way every time.
 
+**Design theory.** *Familiar metaphor:* a blinking cursor is the most widely understood "you are here" sign
+there is, and typing is a rhythm of short tokens, like sung syllables. *Hierarchy by blur and size:* earlier rows are
+smaller, fainter and blurred, so depth of field puts the current row in focus. *Colour as meaning:* the syntax
+palette gives "I" and "you" roles of their own, so the people in a song stand out the way keywords do in code.
+*Motion as punctuation:* the fly-in and the small punch on each new row mark line breaks the way an editor's scroll
+does.
+
 **Notes.**
 - Ignores your font and colours: bold monospaced system type and its own syntax palette, with a dark shadow.
 - Footprint 0.96.
@@ -361,6 +424,10 @@ mid-typing. Symbols take the palette's orange.
 
 **Why it's designed this way.** One picture per row, outside the text, adds a hint of meaning without breaking the
 code's shape.
+
+**Design theory.** *Don't break the shape:* the picture hangs outside the row on a zero-size anchor, so the
+code's alignment, the thing that makes it look like code, is never disturbed. One picture per row is a hint, not a
+second reading path.
 
 **Notes.** As Codestyle. Icons are 0.9 times the font size. Footprint 0.96.
 
@@ -386,6 +453,12 @@ Branches are quadratic curves trimmed by growth, with a spring on the tip.
 **Why it's designed this way.** Planning every branch before the line plays means labels never jump or reflow as
 later words arrive. The scene is laid out narrower and then scaled, so a large Size cannot push the ends of the stem
 off screen. A settled leaf has no glow, because a blur pass per leaf per frame is not free.
+
+**Design theory.** *Continuity and growth:* the stem grows as the line is sung, a direct visual metaphor for a line
+of song moving forward. *Stable layout:* every branch is planned before the line plays, so nothing jumps when later
+words arrive; motion is reserved for things that are new. *Emphasis, then calm:* a word is large and glowing while it
+is sung and settles smaller and dimmer afterwards, so there is only ever one bright thing. The erase at the end runs
+from the start toward the head, the same direction as reading, so the line leaves the way it came.
 
 **Notes.**
 - Uses your font and all three colours.
@@ -415,6 +488,12 @@ own assert-based checks in the self-check.
 stays visible and is clearly older (fainter), while the newest thread draws the eye. The spider is a progress bar in
 disguise.
 
+**Design theory.** *History made visible:* the last few lines stay on the web, faded by steps, so you can glance
+back without losing your place; age is shown by contrast. *Progress in disguise:* the spider draws itself as the page
+fills, a progress bar that belongs to the picture. *Stable placement:* labels are placed once, in sung order, and
+never move; word size is judged against the whole page so nothing changes size later. The twang on arrival gives each
+thread a physical moment of tension and release.
+
 **Notes.**
 - Uses your font and all three colours; the spider is in the text colour.
 - Footprint 0.87.
@@ -440,6 +519,12 @@ without a cache. Lines are drawn first and labels last, so a later line never cr
 **Why it's designed this way.** Fourteen stars make a figure the eye can hold, and joining them in sung order turns
 the line's rhythm into a shape. Whether a word counts as "long" is judged against the whole chunk, so a star never
 changes class part-way through.
+
+**Design theory.** *Closure:* the eye completes a shape from a few joined points, which is why constellations
+work at all; fourteen stars is enough to make a figure and few enough to hold. *Rhythm as shape:* joining stars in
+sung order turns the timing of the line into the geometry of the figure. *Stable classes:* whether a word is "long"
+is decided against the whole chunk, so a star never changes size mid-figure. The twinkle and dust are low-contrast
+background motion, kept well below the active star.
 
 **Notes.**
 - Uses your font and all three colours.
@@ -471,6 +556,14 @@ it covers are left blank, and it appears without spinning, since such letters fa
 the position, so a flip looks identical in the overlay, the preview and a render. The board brings its own colours
 so it reads the same over any wallpaper; only the lamp and marker follow you.
 
+**Design theory.** *Skeuomorphism with a purpose:* a split-flap board is a machine everyone already reads
+as "this has just changed", so a new word is announced by the clatter of the tiles. *Staggered timing:* tiles ripple
+from left to right with a little seeded jitter, which reads as one mechanical sweep rather than a block switching at
+once. *Stepping back in silence:* between lines the board stays up and dims (to 55%, after 5 s of quiet, since
+0.4.2) and is fully lit again 2 s before the next line, so it behaves like a real board waiting for the next
+departure. *Readability by construction:* the board brings its own dark surface and amber letters; only the lamp and
+marker take your colour.
+
 **Notes.**
 - Ignores your font and the text and secondary colours; uses the highlight colour for the lamp and marker. Bold
   condensed system type, upper case.
@@ -499,6 +592,12 @@ outline from the Apple Symbols font.
 flagged eighths, held words open whole notes. A fixed playhead with moving music is how scrolling scores and
 rhythm games read, so the current word is always in the same place.
 
+**Design theory.** *Rhythm as notation:* note values are a centuries-old code for duration, so eighths, quarters,
+halves and whole notes show at a glance which words are quick and which are held. *A fixed reading point:* the music
+moves past a fixed playhead, as in scrolling scores and rhythm games, so the current word is always in the same
+place. *Spacing that never reflows:* the gap between two notes depends only on those two words. The staff fades in
+after a silence and out before one, so a rest looks like a rest.
+
 **Notes.**
 - Uses your font for the words, the text colour and the highlight colour.
 - Footprint 0.85, height only, trimmed so the staff still fits at 150%.
@@ -524,6 +623,13 @@ card's shadow is a SwiftUI shape outside the canvas, so it is not redrawn by han
 **Why it's designed this way.** It reads like studying a lyric sheet: you see the whole line ahead, and the marker
 shows exactly where the singer is. A white highlight (the default) would vanish on paper, so the marker uses your
 highlight colour only when it is saturated and dark enough to show, and classic yellow otherwise.
+
+**Design theory.** *Preview, then mark:* the whole line is visible ahead, like a printed lyric sheet, and the
+marker shows exactly where the singer is, so you can read ahead and still keep your place. *Familiar gesture:* the
+swipe of a highlighter is a learned sign for "this part", and the multiply blend makes it tint the ink as a real
+marker would. *Emphasis without new elements:* a long-held word gets a pen circle drawn in step with the swipe, a
+second marking gesture rather than a new graphic. *Contrast check:* your highlight colour is used only when it would
+show on paper; otherwise classic yellow.
 
 **Notes.**
 - Font: your font if it is New York or Didot, otherwise New York, because printed text wants a serif.
@@ -551,6 +657,12 @@ edge, a darkening just above the tear, and shade where the paper leaves the slot
 
 **Why it's designed this way.** A receipt is a record that grows, which suits a song: the history stays readable on
 paper that brings its own contrast. Each frame is worked out from the position alone, so there is no view state.
+
+**Design theory.** *A record that grows:* a receipt is a list that lengthens as it is printed, a natural
+metaphor for a song unrolling. *Timing as typography:* letters print over each word's sung time, and the line's start
+time is set where a price would be, so the receipt is also a timestamped transcript. *Stepping back in silence:* like
+Departure Board, the receipt stays up and dims in long gaps. The curl and shading are skeuomorphic cues that make the
+paper read as an object in front of the desktop, a surface with its own contrast.
 
 **Notes.**
 - Ignores your font and the text and secondary colours; medium monospaced system type; the highlight colour lights
@@ -593,6 +705,12 @@ the music reads naturally as someone typing. The typing dots run on the wall clo
 music waits. The plan is compared against the whole lyrics, so corrected lyrics of the same shape still get a new
 plan. A fast scroll gets a light blur in place of real motion blur, and blur is never applied at rest.
 
+**Design theory.** *Familiar pattern:* a chat thread is the most practised way most people read short lines
+in sequence, so nothing needs learning. *Meaning in silence:* a pause in the music becomes someone typing, and the
+next line grows out of the typing bubble (spatial continuity). *Emphasis by force:* a word held much longer lands
+harder and sends a ring round the bubble. *Calm in gaps:* the thread dims to 55% after 5 s of quiet and is awake 2 s
+before the next line; the dots keep bouncing on the wall clock so the screen still feels alive while it waits.
+
 **Notes.**
 - System font and its own colours (white on grey or blue).
 - Footprint 1.15. Its gap timings are the ones Departure Board and Receipt borrow.
@@ -624,6 +742,12 @@ one kind never turns into the other in front of you.
 Fixing each row's kind once it is shown keeps late network answers, pauses and seeks from changing what is already on
 screen. Nothing but MapKit touches the network, and your location is never asked for.
 
+**Design theory.** *Fit content to container:* payment screens are made of big, bold, short text, which suits a
+few words at a time. *Variety without chaos:* six kinds of item, chosen once per song and never the same kind twice in
+a row, give the feed rhythm without randomness on screen. *Object permanence:* once a row has appeared as one kind it
+never turns into another, even if a map picture arrives late, so nothing changes in front of you. Items grow out of a
+small lead pill after a pause, the same continuity rule as the window's panels.
+
 **Notes.**
 - System font, its own colours, plus album-cover colours on cards.
 - Footprint 0.81.
@@ -650,6 +774,12 @@ and hairline rims.
 
 **Why it's designed this way.** Notifications are what a lock screen already shows, so lyrics there feel native. The
 glance row turns a long instrumental into something useful: how long until the next line.
+
+**Design theory.** *Native context:* notifications are what a lock screen already shows, so lyrics in that form
+feel at home exactly where Stanza draws them. *Grouping:* banners that arrive close together collapse into a stack,
+the Gestalt principle of common region that the system itself uses. *Useful silence:* in a long instrumental the
+glance row's countdown ring answers the only question there is, how long until the next line. The rainbow rim of the
+assistant panel pulses with each word, so even a decorative surface keeps time.
 
 **Notes.**
 - System font, its own colours, plus album-cover colours in the widget.
@@ -679,6 +809,11 @@ pixels), and the tour backs off when MapKit is slow or throttles.
 names give each line a place. The city and its routes are fixed, so nothing about you is used: your location is
 never read.
 
+**Design theory.** *Progress as distance:* one walked leg per line turns how far you are through the song into how
+far you have walked, and the trail behind you is the song so far. *Place as memory:* real street names give each line
+somewhere to be. *Smooth follow:* the camera eases after the walking dot rather than snapping, so the map never jolts
+under the words. *Privacy by design:* the city and its routes are fixed, so the style needs nothing about you.
+
 **Notes.**
 - In the window, the Map has two extra buttons: **3D** or **Flat**, and **Window** or **Whole display**. Filling the
   display keeps the map at full size, scales only its text, fades the top and bottom to keep the lock-screen clock
@@ -706,6 +841,12 @@ either of the two before. Overlapping lines in duets are indented, as calendars 
 **Why it's designed this way.** A planner shows the shape of the whole song at once: long lines are long blocks, gaps
 are free time, and the chip tells you how long the gap lasts.
 
+**Design theory.** *Overview first:* a day planner shows the shape of the whole song at once: long lines are
+tall blocks and gaps are free time, an instant picture of the song's structure. *A moving "now":* the coral line
+walks down the day and the view keeps it a third of the way down, so there is always context above and plenty to
+come below. *Useful silence:* the header chip tells you how long the gap lasts ("Free until…"). Colours are seeded and
+never repeat either of the two before, so neighbouring events always separate.
+
 **Notes.**
 - System font, its own colours. Footprint 1.
 - No dimming in pauses (the chip says "Free until…"); fades out 4 s after the last line.
@@ -729,6 +870,11 @@ burst at each word's start that decays, sustains while the word lasts and is rou
 **Why it's designed this way.** A transcript under a waveform is a close cousin of karaoke, and the list of takes
 keeps the song's history readable. Deriving the waveform from word timing means no microphone or audio access is
 ever needed.
+
+**Design theory.** *Transcript under a waveform* is the close cousin of karaoke, so the current word in teal is
+read without explanation. *History as a list:* each finished line shrinks into a row above, so the song's past is a
+tidy column. *Honest signal:* the waveform is drawn from word timing, a burst at each word that decays and sustains,
+which looks like speech and needs no microphone; the picture never pretends to hear more than it does.
 
 **Notes.**
 - System font, its own colours. Footprint 1.

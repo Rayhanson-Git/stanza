@@ -9,6 +9,7 @@
 <p align="center">
   <a href="../README.md">README</a> |
   <a href="STYLES.md">Styles</a> |
+  <a href="DESIGN.md">Design</a> |
   <a href="#the-big-picture">Big picture</a> |
   <a href="#song-starts-lyrics-on-screen">Song to screen</a> |
   <a href="#the-per-frame-render-pipeline">Per frame</a> |
@@ -17,11 +18,11 @@
   <a href="#key-design-decisions">Decisions</a>
 </p>
 
-Stanza is one Swift executable of about 16,800 lines in 65 files under `Sources/`, built by `./build.sh` with
+Stanza is one Swift executable of about 17,000 lines in 65 files under `Sources/`, built by `./build.sh` with
 `swiftc` and Apple's Command Line Tools. It uses AppKit for the menu bar, windows and system services, SwiftUI for
 everything drawn, and one third-party framework, Sparkle, for updates. This page explains how the parts fit
 together and why they are built the way they are. File names are given so you can read along; everything here
-describes the current code.
+describes the current code. Why the app looks and moves the way it does is in [DESIGN.md](DESIGN.md).
 
 ## Contents
 
@@ -44,6 +45,12 @@ describes the current code.
 - [Source map](#source-map)
 
 ## The big picture
+
+<p align="center">
+  <img src="../assets/diagrams/architecture.svg" alt="Architecture map: Apple Music and Spotify feed NowPlayingMonitor; LyricEngine keeps the song clock and asks LyricsProvider (disk cache, NetEase, LRCLIB) for timed lyrics; each frame LyricStage builds a StyleContext for one of the 23 styles, drawn in the overlay windows, the gallery window and the render tools; below, the app shell of AppDelegate, AppSettings, LyricPlacement, ArtworkColorSync, AppUpdater and LoginItem" width="100%">
+</p>
+
+The same map as a Mermaid graph, with every connection:
 
 ```mermaid
 flowchart LR
@@ -341,7 +348,12 @@ The window is opened at launch and from **Open Stanza**. While it is open, Stanz
 ### Window controls
 
 Since 0.4.3 the window has two floating controls instead of a bar across the top, so the large preview keeps the
-whole top of the window.
+whole top of the window. The annotated wireframe and the motion study, with every timing, are in
+[DESIGN.md](DESIGN.md#interaction-design).
+
+<p align="center">
+  <img src="../assets/diagrams/window-wireframe.svg" alt="Annotated wireframe of the window: hero preview, name block, Select and star, page dots, Favourites, All styles, the settings pill with a panel rolled up, the gear, the player pill and its card" width="100%">
+</p>
 
 ```mermaid
 flowchart TB
@@ -365,9 +377,11 @@ flowchart TB
   in reach without covering the style, and a panel that grows out of its own button shows where it came from.
 - **The player pill** (`PlayerDock` in `PlayerPanel.swift`) is one glass shell. Pointed at, it widens to the left just
   enough to show "Apple Music" and "Spotify" beside the icons. Clicked, the same shell grows into that player's card:
-  its size and corner radius change, and the same two buttons switch from a column to a row (`AnyLayout`), so the
-  other player's icon slides up beside the chosen one. It is done with one shell rather than two views cross-fading,
-  so the glass never doubles. Its hover state lives in `GalleryHover` and resets when the open player changes.
+  its size and corner radius change, and the two buttons stay in one column whose frame shrinks to a row, with each
+  later icon offset up beside the first. Since 0.4.4 that move is an interpolated offset on the same spring as the
+  shell (response 0.5, damping 0.82), never a change of layout, so the other player's icon glides into place; the
+  panel follows 0.1 s later. It is done with one shell rather than two views cross-fading, so the glass never
+  doubles. Its hover state lives in `GalleryHover` and resets when the open player changes.
   *Why:* the players are status as much as controls (each icon carries its health dot), so they stay small and quiet
   until they are needed, and the card unfolding from the pill keeps the link between the icon and its settings.
 - **Reduce Motion:** panels fade in place instead of rolling, and the pill and its card cross-fade.
@@ -391,6 +405,12 @@ EdDSA signature matches `SUPublicEDKey` in `Info.plist`. The updater is started 
 command-line tools never go online.
 
 **Making a release** (`scripts/release.sh`):
+
+<p align="center">
+  <img src="../assets/diagrams/release-pipeline.svg" alt="Release pipeline in three lanes: on the maintainer's Mac, raise the version, build and sign, pass the self-check and certificate gate, make the disk image, sign it with EdDSA and write appcast.xml, then pass the publish gate; on GitHub, gh release create; on your Mac, check daily, download quietly, verify the signature, install on quit, and stay the same app to macOS" width="100%">
+</p>
+
+Step by step:
 
 ```mermaid
 flowchart TD
@@ -470,6 +490,8 @@ detection, the menu's style groups, gap dimming, the moved-lyrics clamp, and lay
 Notifications, Map, Money, Calendar and Voice Memo. There is no CI and there are no UI tests.
 
 ## Key design decisions
+
+These are the engineering decisions; the visual and interaction ones are in [DESIGN.md](DESIGN.md).
 
 **Styles are pure functions of `StyleContext`.** A style gets everything it needs in one value and returns a view.
 It keeps no state, so the same moment always looks the same. That one rule is why the overlay, the large preview,

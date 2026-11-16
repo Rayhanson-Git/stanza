@@ -7,56 +7,110 @@
 <p align="center"><b>The song you are playing, sung word by word across your Mac's desktop and lock screen.</b></p>
 
 <p align="center">
-  <a href="https://github.com/Rayhanson-Git/stanza/releases/latest"><img src="https://img.shields.io/badge/version-0.4.4-C2302F" alt="Version 0.4.2"></a>
-  <img src="https://img.shields.io/badge/licence-MIT-C2302F" alt="MIT licence">
-  <img src="https://img.shields.io/badge/macOS-15%2B-0F3D3E" alt="macOS 15 or later">
-  <img src="https://img.shields.io/badge/Apple%20silicon-arm64-0F3D3E" alt="Apple silicon (arm64)">
+  <a href="https://github.com/Rayhanson-Git/stanza/releases/latest"><img src="https://img.shields.io/badge/version-0.4.4-C2302F" alt="Version 0.4.4"></a>
+  <img src="https://img.shields.io/badge/styles-23-C2302F" alt="23 styles">
+  <img src="https://img.shields.io/badge/macOS-15%2B-2E6F73" alt="macOS 15 or later">
+  <img src="https://img.shields.io/badge/Apple%20silicon-arm64-2E6F73" alt="Apple silicon (arm64)">
   <img src="https://img.shields.io/badge/Swift-AppKit%20%2B%20SwiftUI-2E6F73" alt="Swift, AppKit and SwiftUI">
-  <img src="https://img.shields.io/badge/styles-23-2E6F73" alt="23 styles">
   <img src="https://img.shields.io/badge/players-Spotify%20%7C%20Apple%20Music-2E6F73" alt="Spotify and Apple Music">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licence-MIT-10202B" alt="MIT licence"></a>
 </p>
 
 <p align="center">
-  <a href="#install">Install</a> |
-  <a href="#features-at-a-glance">Features</a> |
-  <a href="#the-23-styles">Styles</a> |
-  <a href="#using-stanza">Using Stanza</a> |
-  <a href="#privacy-and-network">Privacy</a> |
-  <a href="#build-from-source">Build</a> |
-  <a href="#developer-tools">Developer tools</a> |
-  <a href="#releases">Releases</a> |
-  <a href="#project-layout">Layout</a> |
+  <a href="#install">Install</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#the-23-styles">Styles</a> ·
+  <a href="#read-deeper">Design and architecture</a> ·
+  <a href="#using-stanza">Using Stanza</a> ·
+  <a href="#privacy-and-network">Privacy</a> ·
+  <a href="#build-from-source">Build</a> ·
+  <a href="#releases">Releases</a> ·
   <a href="#licence">Licence</a>
-</p>
-
-<p align="center">
-  <a href="docs/STYLES.md"><b>The 23 styles, one by one →</b></a>
-  &nbsp;&nbsp;·&nbsp;&nbsp;
-  <a href="docs/ARCHITECTURE.md"><b>How Stanza works, with diagrams →</b></a>
 </p>
 
 <p align="center">
   <img src="assets/banner.png" alt="Stanza banner: the logo, the name, and four styles from the app: Messages, Map, Codestyle and Notifications" width="100%">
 </p>
 
-## What it is
+## Why Stanza
 
-Stanza is a small macOS menu-bar app for people who like to see the words of a song while it plays. It follows the
-track playing in Spotify or Apple Music, finds lyrics timed to the song, and draws them over the desktop and above
-the lock screen, one word at a time, as they are sung.
-
-There are 23 ways to draw the words. Some are **kinetic type**: words that stack, swell, stretch on held notes, are
-cut from magazines, write themselves in ink or ooze out of each other. Some are **motion scenes**: code being typed,
-a growing branch, a spider web, a star chart, a split-flap departure board, a music staff, a marker on a lyric sheet,
-a printing receipt. Six are **phone screens**: the song arrives as a chat thread, a run of payments, a pile of
-lock-screen alerts, a walk across a city map, a day planner or a list of voice recordings.
-
-A window plays every style as a live preview, so you pick one by watching it. While a song with lyrics plays, the
-previews follow it in time; otherwise they play a built-in demo.
+Stanza puts the words of the song you are playing where you already are: over the desktop and above the lock
+screen, one word at a time, exactly as each is sung. It follows
+the track playing in Spotify or Apple Music, finds lyrics timed to the song, and draws them in one of 23 styles, from
+kinetic type that stretches on held notes to a split-flap departure board and a chat thread. Everything is designed
+around one rule: the words come first. They stay readable over any wallpaper, land in time with the music, step back
+in silence, and never ask for attention they have not earned. No accounts, no analytics, no telemetry.
 
 <p align="center">
-  <img src="assets/window.png" alt="The Stanza window: the Departure Board style playing in the large preview, with the Settings gear and the vertical player pill at the top right, the slim Size, Font, Lock Screen and Aesthetics pill floating at the bottom, and the Favourites row" width="100%">
+  <img src="assets/window.png" alt="The Stanza window: the Departure Board style playing in the large preview, caught mid-flip as its last word lands, with Select and the Favourite star below it, the page dots, the Settings gear and the slim vertical player pill at the top right, the Size, Font, Lock Screen and Aesthetics pill floating at the bottom, and the Favourites row" width="100%">
 </p>
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/window-music.png" alt="The window with the Apple Music card open: the player pill grown into a card at the top right with four numbered connection steps, all still to do while it checks, and the timing slider; the large preview has moved left to make room"></td>
+    <td width="50%"><img src="assets/window-size.png" alt="The window with the Size panel rolled up above the Size button of the bottom settings pill: a slider from small to large Aa at 100% with a Reset button"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><b>The player pill grows into its card.</b> Both icons slide into one row on top.</sub></td>
+    <td align="center"><sub><b>A panel rolls up out of its button.</b> One at a time; Esc or a click away closes it.</sub></td>
+  </tr>
+</table>
+
+<p align="center"><sub>The window, drawn offscreen by <code>Stanza --render-gallery</code>. Offscreen pictures show the glass as its flat fallback; on macOS 26 it is Liquid Glass.</sub></p>
+
+## Features
+
+<table>
+  <tr>
+    <td width="33%" valign="top"><b>Lyrics where you look</b><br>Above the lock screen, and over the desktop too if you like, on every display or only the ones you choose.</td>
+    <td width="33%" valign="top"><b>Word by word</b><br>Each word appears as it is sung. Songs with only line timing get an estimated time for each word.</td>
+    <td width="33%" valign="top"><b>23 styles, live</b><br>Every style plays in the window before you pick it, following your song or a built-in demo.</td>
+  </tr>
+  <tr>
+    <td valign="top"><b>Favourites</b><br>Star the styles you like; they get their own row, and the menu-bar menu then lists only those.</td>
+    <td valign="top"><b>Your look</b><br>Size from 25% to 150%, seven fonts, three colours of your own or colours from the album cover.</td>
+    <td valign="top"><b>Put it anywhere</b><br>Drag Position: a slim glass pill to move and size the lyrics in one go, even past the edge of the screen.</td>
+  </tr>
+  <tr>
+    <td valign="top"><b>Timing you can correct</b><br>Nudge one song a second at a time, or set a standing offset for every song.</td>
+    <td valign="top"><b>Songs in English letters</b><br>Hindi, Urdu, Punjabi and Bengali songs show a version in English letters when one exists.</td>
+    <td valign="top"><b>A guided setup</b><br>Each player shows what it still needs, as numbered steps, with a button for the next one.</td>
+  </tr>
+  <tr>
+    <td valign="top"><b>Same size, any style</b><br>Every style was measured and balanced, so the same Size fills about the same part of the screen.</td>
+    <td valign="top"><b>Calm</b><br>Lyrics step back in long gaps, fade 10 seconds into a pause, and honour Reduce Motion in the window and in 14 styles.</td>
+    <td valign="top"><b>Quiet</b><br>No accounts, no analytics, no telemetry. It stops drawing whenever nothing can be seen.</td>
+  </tr>
+</table>
+
+## Read deeper
+
+Stanza is documented as a design project as much as an app: every look, every motion and every part of the code is
+explained, with the reasoning and the numbers.
+
+<table>
+  <tr>
+    <td width="33%" valign="top">
+      <b><a href="docs/DESIGN.md">Design →</a></b><br>
+      The principles (figure and ground, rhythm, continuity, progressive disclosure), the visual language, the motion
+      system with every spring and timing, interaction design and accessibility.
+    </td>
+    <td width="33%" valign="top">
+      <b><a href="docs/ARCHITECTURE.md">Architecture →</a></b><br>
+      From the AppleScript poll to the lock-screen window: the song clock, the lyrics sources, the per-frame pipeline,
+      the window and the update pipeline, with diagrams.
+    </td>
+    <td width="33%" valign="top">
+      <b><a href="docs/STYLES.md">The 23 styles →</a></b><br>
+      How each style plays, how it is built, why it looks that way, and the design theory behind its look and motion.
+    </td>
+  </tr>
+  <tr>
+    <td valign="top"><a href="docs/DESIGN.md"><img src="assets/diagrams/motion.svg" alt="Motion diagram: the player pill growing into its card, a panel rolling up out of its button, and lyrics dimming in silence"></a></td>
+    <td valign="top"><a href="docs/ARCHITECTURE.md"><img src="assets/diagrams/architecture.svg" alt="Architecture map from the players to the overlay windows"></a></td>
+    <td valign="top"><a href="docs/STYLES.md"><img src="assets/style-departureboard.png" alt="Departure Board style: lyric lines on a split-flap board"></a></td>
+  </tr>
+</table>
 
 ## Install
 
@@ -75,21 +129,6 @@ next time Stanza restarts. While an update waits, the menu-bar menu and the wind
 Choose **Check for Updates…** at any time, or switch off automatic installs under the gear at the top right of the
 window. Updates are only installed when they carry this project's signature. What changed in each version is in
 [CHANGELOG.md](CHANGELOG.md).
-
-## Features at a glance
-
-| | |
-|---|---|
-| **Lyrics where you look** | Above the lock screen, and over the desktop too if you like, on every display or only the ones you choose. |
-| **Word by word** | Each word appears as it is sung. Songs with only line timing get an estimated time for each word. |
-| **23 styles, live** | Every style plays in the window before you pick it, following your song or a built-in demo. |
-| **Favourites** | Star the styles you like; the menu-bar menu then lists only those. |
-| **Your look** | Size from 25% to 150%, seven fonts, three colours of your own or colours from the album cover. |
-| **Put it anywhere** | Drag Position: a small glass pill to move and size the lyrics in one go. |
-| **Timing you can correct** | Nudge one song a second at a time, or set a standing offset for every song. |
-| **Songs in English letters** | Hindi, Urdu, Punjabi and Bengali songs show a version in English letters when one exists. |
-| **A guided setup** | Each player shows what it still needs, as numbered steps, with a button for the next one. |
-| **Quiet** | No accounts, no analytics, no telemetry. It pauses itself whenever nothing can be seen. |
 
 ## The 23 styles
 
@@ -144,10 +183,14 @@ Each name links to its section in [docs/STYLES.md](docs/STYLES.md): how it plays
 
 ### The window
 
+<p align="center">
+  <img src="assets/diagrams/window-wireframe.svg" alt="Annotated wireframe of the window: hero preview, name block, Select and star, chevrons and page dots, Favourites, All styles, the settings pill with the Size panel rolled up, the Settings gear, the player pill, and the player card it grows into" width="100%">
+</p>
+
 The window opens when Stanza starts and whenever you choose **Open Stanza** from the menu-bar icon. While it is open,
 Stanza also has a Dock icon. The large preview at the top plays the style you are browsing; use the arrows (or ← and
-→) or the dots to browse, **Select** to use one, and the star to make it a Favourite. Below it, Favourites have their
-own row of tiles above all the styles. A tile starts playing when you rest the pointer on it.
+→) or the dots to browse, **Select** (or Return) to use one, and the star to make it a Favourite. Below it,
+Favourites have their own row of tiles above all the styles. A tile starts playing when you rest the pointer on it.
 
 <p align="center">
   <img src="assets/shelf.png" alt="The window's Favourites row and the All styles shelf: all 23 style tiles" width="100%">
@@ -158,7 +201,8 @@ own row of tiles above all the styles. A tile starts playing when you rest the p
 The slim pill floating at the bottom of the window holds the lyric settings: each button rolls its panel up out of
 itself. The gear at the top right opens Settings. Below it, a slim vertical pill holds Apple Music and Spotify: point
 at it and it widens to show their names; click one and the whole pill grows into that player's panel, with both icons
-side by side across its top. See [the window controls](docs/ARCHITECTURE.md#window-controls) for why they work this way.
+side by side across its top. A panel closes on a second click, on another button, on a click anywhere in the page, or
+with Esc. Why the controls work this way is in [DESIGN.md](docs/DESIGN.md#interaction-design).
 
 | Panel | What it holds |
 |---|---|
@@ -227,7 +271,7 @@ No other permission is needed. Stanza does not ask for your location, microphone
 
 ## Status and limits
 
-Version 0.4.2.
+Version 0.4.4.
 
 - **Not notarised.** Releases are signed with the project's own certificate, not an Apple developer identity, so the
   first time you open a downloaded copy macOS blocks it until you allow it (see [Install](#install)).
@@ -312,8 +356,17 @@ $APP --render-tile "Web" web-tile.png                      # one shelf tile
   the tilted words of Ship, Visual and the Fisheye styles land in the wrong place. Use another style for that render.
 
 The images in `assets/` were made this way. The style frames are `--render` output at Size 100% in SF Pro, cropped
-to the lyric band (`sips -c 600 1440 --cropOffset 204 0`, since the band is centred 56% of the way down). The banner
-and social preview are drawn from them by `design/banner/banner.swift`:
+to the lyric band (`sips -c 600 1440 --cropOffset 204 0`, since the band is centred 56% of the way down). The window
+pictures are `--render-gallery` with the views `none`, `music` and `size`, and overrides that pin the look to the
+defaults without touching your settings:
+
+```bash
+$APP --render-gallery assets/window.png none -pinnedStyles '<array/>' -lyricStyle 'Departure Board' \
+  -textScale '<real>1</real>' -lyricOffsetX '<real>0</real>' -lyricOffsetY '<real>0</real>' -lyricFont 'SF Pro'
+```
+
+The diagrams in `assets/diagrams/` are hand-written SVG in the project's palette. The banner and social preview are
+drawn from the style frames by `design/banner/banner.swift`:
 
 ```bash
 swiftc -O -swift-version 5 -target arm64-apple-macosx15.0 design/banner/banner.swift -o /tmp/stanza-banner
@@ -321,6 +374,10 @@ swiftc -O -swift-version 5 -target arm64-apple-macosx15.0 design/banner/banner.s
 ```
 
 ## Releases
+
+<p align="center">
+  <img src="assets/diagrams/release-pipeline.svg" alt="Release pipeline in three lanes: on the maintainer's Mac, raise the version, build and sign, pass the self-check and certificate gate, make the disk image, sign it with EdDSA and write appcast.xml, then pass the publish gate; on GitHub, gh release create; on your Mac, check daily, download quietly, verify the signature, install on quit" width="100%">
+</p>
 
 Updates use [Sparkle](https://sparkle-project.org). To make a release, raise `CFBundleShortVersionString` and
 `CFBundleVersion` in `Info.plist`, add a section for the version to `CHANGELOG.md`, commit and push, then run:
@@ -333,7 +390,7 @@ scripts/release.sh --publish   # the same, then the GitHub release
 The script builds the app, makes the disk image, signs it for the updater, writes the update feed with the
 version's changelog section as its notes, and with `--publish` creates the GitHub release, but only from a clean
 working tree that matches `origin/main`. Installed copies read the feed attached to the latest release, so publishing
-a release is what makes them update. The whole pipeline is drawn in
+a release is what makes them update. The whole pipeline is described in
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#updates-and-releases).
 
 Two keys live in the maintainer's login Keychain, never in this repository:
@@ -351,7 +408,7 @@ Both are backed up outside this Mac. On a new Mac, import the certificate's `.p1
 ## Project layout
 
 ```text
-Sources/            the app: 65 Swift files, about 16,800 lines
+Sources/            the app: 65 Swift files, about 17,000 lines
   main.swift          entry point and the command-line tools
   AppDelegate.swift   the menu-bar menu and app lifecycle
   NowPlayingMonitor.swift, PlayerLink.swift   reading the players, and the permission steps
@@ -368,11 +425,11 @@ Info.plist          bundle ID tech.rayhanson.stanza, macOS 15 minimum, the updat
 build.sh            fetch Sparkle, build, sign, self-check
 scripts/release.sh  disk image, update signature, feed and GitHub release
 CHANGELOG.md        what changed in each version
-docs/               ARCHITECTURE.md (how it works) and STYLES.md (every style)
+docs/               DESIGN.md (why it looks and moves as it does), ARCHITECTURE.md (how it works), STYLES.md (every style)
 design/logo/        the script that draws the logo and icon, and the exploration sheet of forms
 design/banner/      the script that draws the README banner and the social preview
 design/dmg/         the script that draws the disk-image background
-assets/             README and docs images
+assets/             README and docs images; assets/diagrams/ holds the SVG diagrams
 ```
 
 The logo, called Quatrain, is drawn in code by `design/logo/quatrain_variations.swift`; its header explains how to

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-labelledby="t d">
+  <title id="t">Stanza identity palette</title>
+  <desc id="d">Six colours: navy 0A0F14, deep navy 10202B, cream EADCC8, crimson C2302F, teal 2E6F73 and light teal 7FB3B8.</desc>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif; fill: #EADCC8; }
+    .t { font-size: 22px; font-weight: 700; }
+    .n { font-size: 15px; font-weight: 700; }
+    .h { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 13px; fill: #7FB3B8; }
+    .r { font-size: 13px; fill: #C9BBA8; }
+  </style>
+  <rect x="0" y="0" width="1200" height="320" rx="24" fill="#0A0F14" stroke="#10202B" stroke-width="2"/>
+  <text x="32" y="60" class="t">Stanza palette: cream words on navy, one crimson word for now</text>
+  <rect x="32" y="96" width="176" height="120" rx="16" fill="#0A0F14" stroke="#2E6F73" stroke-width="1.2"/>
+  <text x="36" y="246" class="n">Navy</text>
+  <text x="36" y="268" class="h">#0A0F14</text>
+  <text x="36" y="288" class="r">ground</text>
+  <rect x="224" y="96" width="176" height="120" rx="16" fill="#10202B" stroke="#2E6F73" stroke-width="1.2"/>
+  <text x="228" y="246" class="n">Deep navy</text>
+  <text x="228" y="268" class="h">#10202B</text>
+  <text x="228" y="288" class="r">raised surfaces</text>
+  <rect x="416" y="96" width="176" height="120" rx="16" fill="#EADCC8" stroke="#2E6F73" stroke-width="1.2"/>
+  <text x="420" y="246" class="n">Cream</text>
+  <text x="420" y="268" class="h">#EADCC8</text>
+  <text x="420" y="288" class="r">the words</text>
+  <rect x="608" y="96" width="176" height="120" rx="16" fill="#C2302F" stroke="#2E6F73" stroke-width="1.2"/>
+  <text x="612" y="246" class="n">Crimson</text>
+  <text x="612" y="268" class="h">#C2302F</text>
+  <text x="612" y="288" class="r">now, emphasis</text>
+  <rect x="800" y="96" width="176" height="120" rx="16" fill="#2E6F73" stroke="#2E6F73" stroke-width="1.2"/>
+  <text x="804" y="246" class="n">Teal</text>
+  <text x="804" y="268" class="h">#2E6F73</text>
+  <text x="804" y="288" class="r">structure</text>
+  <rect x="992" y="96" width="176" height="120" rx="16" fill="#7FB3B8" stroke="#2E6F73" stroke-width="1.2"/>
+  <text x="996" y="246" class="n">Light teal</text>
+  <text x="996" y="268" class="h">#7FB3B8</text>
+  <text x="996" y="288" class="r">annotation</text>
+</svg>
