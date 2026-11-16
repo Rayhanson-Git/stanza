@@ -91,16 +91,21 @@ struct GalleryTopBar: View {
                     .padding(.leading, GalleryPanel.margin)
             }
             HStack(spacing: 2) {
-                ForEach(GalleryMenu.settings, id: \.self) { menu in
+                ForEach(GalleryMenu.lyricSettings, id: \.self) { menu in
                     MenuButton(title: menu.title, isOpen: model.menu == menu, hover: model.hover) { model.toggle(menu) }
                 }
             }
             .padding(4)
             .modifier(GlassSurface(shape: Capsule()))
-            PlayerButtons(model: model, link: model.playerLink, monitor: model.monitor)
-                .padding(4)
-                .modifier(GlassSurface(shape: Capsule()))
-                .frame(maxWidth: .infinity, alignment: .trailing)
+            HStack(spacing: 10) {
+                PlayerButtons(model: model, link: model.playerLink, monitor: model.monitor)
+                    .padding(4)
+                    .modifier(GlassSurface(shape: Capsule()))
+                SettingsButton(model: model)
+                    .padding(4)
+                    .modifier(GlassSurface(shape: Circle()))
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
                 .padding(.trailing, GalleryPanel.margin)
         }
         .frame(height: Self.height)

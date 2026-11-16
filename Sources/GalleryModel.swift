@@ -3,9 +3,10 @@ import SwiftUI
 
 /// The panels that can hang from the top bar. Only one is open at a time.
 enum GalleryMenu: String, CaseIterable {
-    case size, font, lockScreen, aesthetics, spotify, music
+    case size, font, lockScreen, aesthetics, spotify, music, settings
 
-    static let settings: [GalleryMenu] = [.size, .font, .lockScreen, .aesthetics]
+    /// The lyric settings in the centre of the top bar; the players and Settings sit at its right.
+    static let lyricSettings: [GalleryMenu] = [.size, .font, .lockScreen, .aesthetics]
 
     init(player: Player) { self = player == .spotify ? .spotify : .music }
 
@@ -17,6 +18,7 @@ enum GalleryMenu: String, CaseIterable {
         case .aesthetics: return "Aesthetics"
         case .spotify: return Player.spotify.displayName
         case .music: return Player.music.displayName
+        case .settings: return "Settings"
         }
     }
 
@@ -82,6 +84,7 @@ final class GalleryModel: ObservableObject {
     let playerLink: PlayerLink
     /// Absent in the offscreen render tool, which must never go online.
     let updater: AppUpdater?
+    let loginItem = LoginItem()
     let stills: StyleStills
     let hover = GalleryHover()
 

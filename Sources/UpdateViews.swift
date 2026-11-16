@@ -1,37 +1,98 @@
 import SwiftUI
 
-/// The foot of the window: which Stanza this is, how updates are going, and the one switch for them.
-struct UpdateFooter: View {
-    private static let switchWidth: CGFloat = 290
+/// The gear at the top right of the window; it opens the Settings panel.
+struct SettingsButton: View {
+    private static let size: CGFloat = 36
 
+    @ObservedObject var model: GalleryModel
+
+    var body: some View {
+        let isOpen = model.menu == .settings
+        Hoverable(id: "settings", hover: model.hover) { hovered in
+            Button { model.toggle(.settings) } label: {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(.white)
+                    .frame(width: Self.size, height: Self.size)
+                    .background(Color.white.opacity(isOpen ? 0.18 : hovered ? 0.08 : 0), in: Circle())
+                    .contentShape(Circle())
+            }
+            .buttonStyle(.plain)
+            .help("Settings")
+            .accessibilityLabel("Settings")
+            .accessibilityAddTraits(isOpen ? .isSelected : [])
+        }
+    }
+}
+
+/// Settings: opening at login, and updates.
+struct SettingsPanel: View {
+    @ObservedObject var loginItem: LoginItem
+    let updater: AppUpdater?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            let switchedOn = loginItem.isOn || loginItem.needsApproval
+            SettingSwitch(title: "Open at login", detail: "Start Stanza when you log in to this Mac.",
+                          isOn: Binding(get: { switchedOn }, set: { loginItem.set($0) }))
+                // Turning it off always works; turning it on needs the copy in Applications.
+                .disabled(!LoginItem.isInstalled && !switchedOn)
+            if !LoginItem.isInstalled && !switchedOn {
+                PanelNote(text: "Move Stanza into your Applications folder and open it from there to use this.")
+            }
+            if loginItem.needsApproval {
+                PanelNote(text: "Allow Stanza in System Settings › General › Login Items to finish.")
+            }
+            if let problem = loginItem.problem { PanelNote(text: problem) }
+            if let updater {
+                PanelRule()
+                UpdateSettings(updater: updater)
+            }
+        }
+        .onAppear { loginItem.refresh() }
+    }
+}
+
+/// The updates part of Settings: the automatic-install switch, the version and the check button.
+struct UpdateSettings: View {
     @ObservedObject var updater: AppUpdater
 
     var body: some View {
-        HStack(spacing: 18) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Stanza \(AppUpdater.currentVersion)").font(.system(size: 13.5, weight: .medium)).foregroundStyle(.white)
-                Text(status).font(.system(size: 12)).foregroundStyle(.white.opacity(0.55))
+        VStack(alignment: .leading, spacing: 12) {
+            SettingSwitch(title: "Install updates automatically", detail: "Downloads quietly and installs when Stanza restarts.",
+                          isOn: Binding(get: { updater.installsAutomatically }, set: { updater.installsAutomatically = $0 }))
+            HStack(alignment: .center, spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Stanza \(AppUpdater.currentVersion)").font(.system(size: 13.5, weight: .medium)).foregroundStyle(.white)
+                    Text(status).font(.system(size: 12)).foregroundStyle(.white.opacity(0.55))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .layoutPriority(1)
+                Spacer(minLength: 6)
+                Button(buttonTitle) { updater.act() }
+                    .buttonStyle(QuietButtonStyle())
+                    .fixedSize()
+                    .disabled(!updater.canAct)
             }
-            Spacer(minLength: 12)
-            SettingSwitch(title: "Install updates automatically", isOn: Binding(
-                get: { updater.installsAutomatically }, set: { updater.installsAutomatically = $0 }))
-                .frame(width: Self.switchWidth)
-            Button(updater.actionTitle) { updater.act() }
-                .buttonStyle(QuietButtonStyle())
-                .disabled(!updater.canAct)
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 14)
-        .background(Color.white.opacity(0.05), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    /// Shorter than the menu's wording, so it fits beside the version.
+    private var buttonTitle: String {
+        switch updater.pending {
+        case .ready: return "Restart"
+        case .available: return "Update…"
+        case nil: return "Check Now"
+        }
     }
 
     private var status: String {
         switch updater.pending {
-        case .ready(let version): return "Version \(version) is downloaded and installs when Stanza restarts."
+        case .ready(let version): return "Version \(version) is ready. It installs when Stanza restarts."
         case .available(let version): return "Version \(version) is available."
         case nil:
             guard let lastCheck = updater.lastCheck else { return "Looks for updates once a day." }
-            return "Up to date. Last checked \(lastCheck.formatted(.relative(presentation: .named)))."
+            return "Up to date. Checked \(lastCheck.formatted(.relative(presentation: .named)))."
         }
     }
 }

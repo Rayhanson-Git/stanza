@@ -2,6 +2,11 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.3.3
+
+- A Settings panel behind the gear at the top right of the window, in the same glass as the other panels. It holds the new **Open at login** switch, **Install updates automatically**, the version and **Check Now**.
+- The update strip at the bottom of the window is gone; everything it held is in Settings.
+
 ## 0.3.2
 
 - Stanza is now signed with its own fixed certificate, so macOS remembers that you allowed it to read Spotify and Music. After this update it may ask one last time; after that, updates no longer bring the question back.

@@ -35,6 +35,7 @@ struct GalleryPanel: View {
                                    settings: model.settings)
         case .music: PlayerPanel(player: .music, link: model.playerLink, monitor: model.monitor, engine: model.engine,
                                  settings: model.settings)
+        case .settings: SettingsPanel(loginItem: model.loginItem, updater: model.updater)
         }
     }
 }

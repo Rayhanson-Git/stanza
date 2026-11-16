@@ -55,7 +55,7 @@ What you get:
 
 ## Status and limits
 
-Version 0.3.2. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+Version 0.3.3. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
 source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
@@ -133,6 +133,7 @@ runs through `LyricStage`, the same view that draws the real overlay, so what yo
 | **Font** | SF Pro, SF Rounded, New York, Helvetica Neue, Avenir Next, Futura or Didot. The phone-screen styles keep the system typeface. |
 | **Lock Screen** | Show lyrics when unlocked too, or on the lock screen only. Keep the screen from sleeping while a song plays. Turn each display on or off. |
 | **Aesthetics** | Three colours (lyric text, highlight, secondary text) from the system colour picker, or colours taken from the album cover of each song. The phone-screen styles bring their own colours. |
+| **Settings** (the gear) | Open Stanza at login. Install updates automatically. The version, and **Check Now** for updates. |
 | **Spotify**, **Apple Music** | Connection status as numbered steps (player open, permission, playing, lyrics found), with a one-click fix for the step that is still open. A per-song nudge in 1-second steps (up to 20 seconds either way, forgotten at the next song) and a saved offset of up to 1 second for every song. |
 
 Other details:
@@ -154,7 +155,7 @@ Other details:
 
 Stanza then updates itself. Once a day it looks for a new version, downloads it quietly and installs it the next time
 Stanza restarts. While an update waits, the menu-bar menu and the window offer **Restart to Update**. Choose **Check
-for Updates…** at any time, or switch off automatic installs at the bottom of the window. Updates are only installed
+for Updates…** at any time, or switch off automatic installs under the gear at the top right of the window. Updates are only installed
 when they carry this project's signature. What changed in each version is in [CHANGELOG.md](CHANGELOG.md).
 
 ## Build from source
@@ -183,8 +184,7 @@ to `/Applications` first if you prefer.
 The window opens when Stanza starts and whenever you choose **Open Stanza** from the menu-bar icon. While it is open,
 Stanza also has a Dock icon. Use the arrows or the dots to browse the styles in the large preview, **Select** to use
 one, and the pin button to keep it at the top of the menu-bar menu. The panels across the top hold the settings; the
-player icons at the top right open the Spotify and Apple Music panels. At the bottom of the window are the version,
-**Check for Updates…** and the switch for automatic updates.
+player icons at the top right open the Spotify and Apple Music panels, and the gear beside them opens Settings.
 
 ### The menu bar
 

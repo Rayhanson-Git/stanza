@@ -26,7 +26,6 @@ struct GalleryShelf: View {
                                 action: { onPick(style) }, onPin: { settings.togglePin(style) })
                 }
             }
-            if let updater = model.updater { UpdateFooter(updater: updater).padding(.top, 22) }
         }
         .padding(.horizontal, 44)
         .padding(.top, 26)
