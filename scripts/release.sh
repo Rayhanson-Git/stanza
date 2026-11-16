@@ -18,6 +18,10 @@ publish=false
 [ "${1:-}" = "--publish" ] && publish=true
 
 ./build.sh
+# Every release must carry the same certificate identity, or macOS forgets Stanza's permissions on update.
+requirement=$(codesign -d -r- build/Stanza.app 2>&1)
+[[ "$requirement" == *"certificate leaf"* ]] ||
+    { echo "Not signed with the Stanza Release Signing certificate: see the README's Releases section"; exit 1; }
 plist() { /usr/libexec/PlistBuddy -c "Print :$1" build/Stanza.app/Contents/Info.plist; }
 VERSION=$(plist CFBundleShortVersionString)
 BUILD=$(plist CFBundleVersion)

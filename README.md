@@ -55,15 +55,15 @@ What you get:
 
 ## Status and limits
 
-Version 0.3.1. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+Version 0.3.2. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
 source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
 - **Apple silicon and macOS 15 or later.** The build targets `arm64-apple-macosx15.0` only.
-- **Not notarised.** Stanza is signed without an Apple developer identity. The first time you open a downloaded copy,
-  macOS blocks it until you allow it in System Settings (see [Install](#install)). For the same reason macOS asks for
-  Automation permission before Stanza can read Spotify or Apple Music, and may ask again after an update or rebuild,
-  because the signature changes.
+- **Not notarised.** Releases are signed with the project's own certificate, not an Apple developer identity. The first
+  time you open a downloaded copy, macOS blocks it until you allow it in System Settings (see [Install](#install)).
+  Because every release carries the same certificate, macOS remembers your Automation permission for Spotify and
+  Apple Music across updates. A copy you build yourself is signed ad hoc, and macOS may ask again after each rebuild.
 - **The lock screen relies on a private API.** Drawing above the lock screen uses an undocumented window-server
   interface. Every call is looked up at runtime and the app keeps working without it (lyrics then show only while the
   Mac is unlocked), but a macOS update could break it at any time.
@@ -291,10 +291,18 @@ scripts/release.sh             # build/release/Stanza-<version>.dmg and appcast.
 scripts/release.sh --publish   # the same, then the GitHub release
 ```
 
-The disk image is signed with a private EdDSA key kept in the maintainer's login Keychain (made once with
-`Vendor/Sparkle-*/bin/generate_keys --account tech.rayhanson.stanza`); the matching public key is `SUPublicEDKey` in
-`Info.plist`. Installed copies read the feed attached to the latest release, so publishing a release is what makes
-them update.
+Two keys live in the maintainer's login Keychain, never in this repository:
+
+- **The update key.** A private EdDSA key signs each disk image, and installed copies only accept updates that carry its
+  signature. It was made once with `Vendor/Sparkle-*/bin/generate_keys --account tech.rayhanson.stanza`; its public half
+  is `SUPublicEDKey` in `Info.plist`.
+- **The code-signing certificate** "Stanza Release Signing". `build.sh` signs with it when it is in the Keychain, and
+  ad hoc otherwise; `scripts/release.sh` refuses to publish without it, so every release keeps the same identity.
+
+Both are backed up outside this Mac. On a new Mac, import the certificate's `.p12` file into the login Keychain (allow
+`/usr/bin/codesign` to use its key) and restore the update key with `generate_keys --account tech.rayhanson.stanza -f
+<file>`. Installed copies read the feed attached to the latest release, so publishing a release is what makes them
+update.
 
 ## Project layout
 

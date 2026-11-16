@@ -30,7 +30,15 @@ cp Resources/Stanza.icns Resources/StanzaMenuBar.png Resources/StanzaMenuBar@2x.
 # Sparkle keeps its own signature; ditto keeps the framework's symlinks intact.
 rm -rf "$APP/Contents/Frameworks" && mkdir -p "$APP/Contents/Frameworks"
 ditto "$SPARKLE_DIR/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
-codesign --force --sign - "$APP"
+# Releases are signed with the maintainer's "Stanza Release Signing" certificate, so the app keeps one identity and
+# macOS remembers its Spotify and Music permission across updates. Without that certificate it is signed ad hoc.
+SIGNING_IDENTITY="Stanza Release Signing"
+identities=$(security find-identity -p codesigning 2>/dev/null || true)
+if [[ "$identities" == *"\"$SIGNING_IDENTITY\""* ]]; then
+    codesign --force --sign "$SIGNING_IDENTITY" "$APP"
+else
+    codesign --force --sign - "$APP"
+fi
 codesign --verify --deep --strict "$APP"
 "$APP/Contents/MacOS/Stanza" --self-check
 echo "Built $APP"
