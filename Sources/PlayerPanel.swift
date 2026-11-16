@@ -270,6 +270,7 @@ struct StandingTimingControl: View {
             HStack(spacing: 10) {
                 edgeLabel("Earlier")
                 Slider(value: later, in: AppSettings.syncOffsetRange) { Text("Timing for all songs") }.labelsHidden().tint(.white)
+                    .adjustsWithScroll(later, in: AppSettings.syncOffsetRange)
                 edgeLabel("Later")
             }
             HStack {

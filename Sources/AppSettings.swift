@@ -62,7 +62,7 @@ extension NSColor {
 /// User preferences, persisted in UserDefaults and observed by the overlay views.
 final class AppSettings: ObservableObject {
     static let shared = AppSettings()
-    static let textScaleRange = 0.5...1.5
+    static let textScaleRange = 0.25...1.5
     /// Seconds added to the lyric clock; positive shows lyrics earlier.
     static let syncOffsetRange = -1.0...1.0
 

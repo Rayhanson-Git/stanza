@@ -34,6 +34,9 @@ enum LyricStyle: String, CaseIterable {
         }
     }
 
+    /// These cards stay on screen through gaps, dimming like Messages instead of vanishing (`StyleContext.gapPresence`).
+    var keepsCardBetweenLines: Bool { self == .departureBoard || self == .receipt }
+
     /// These styles tint their cards with colours from the album cover.
     var usesArtworkPalette: Bool { self == .money || self == .notifications }
 
@@ -130,6 +133,26 @@ struct StyleContext {
     /// by start time would land in the wrong line.
     var newestWordIndex: Int { lyrics.lines[..<line.index].reduce(0) { $0 + $1.count } + max(1, line.shown) - 1 }
     func font(_ size: CGFloat) -> Font { Font(settings.font.font(size: size) as CTFont) }
+
+    /// The Messages rule for a card kept up through gaps: full while a line is sung, eased down to 55% after 5 s of
+    /// quiet, awake again 2 s before the next line, and gone a few seconds after the last one. Before the first line
+    /// it is 1, so each style keeps its own entrance.
+    var gapPresence: Double {
+        let lines = lyrics.lines, index = line.index
+        let quiet = position - (line.words.last?.end ?? position)
+        guard index + 1 < lines.count else { return 1 - GapDimming.ease((quiet - GapDimming.endAfter) / GapDimming.endRamp) }
+        return 1 - GapDimming.dimDepth * GapDimming.ease((quiet - GapDimming.dimAfter) / GapDimming.dimRamp)
+            * GapDimming.ease((lines[index + 1][0].start - position - GapDimming.wakeBefore) / GapDimming.wakeRamp)
+    }
+}
+
+/// The same timings as the Messages style's own dimming.
+private enum GapDimming {
+    static let dimAfter = 5.0, dimRamp = 2.0, dimDepth = 0.45, wakeBefore = 2.0, wakeRamp = 0.8
+    static let endAfter = 4.0, endRamp = 2.5
+
+    /// Clamped smoothstep.
+    static func ease(_ value: Double) -> Double { let x = min(max(value, 0), 1); return x * x * (3 - 2 * x) }
 }
 
 /// Deterministic value in 0..<1 derived from a seed (usually a word's start time), so each word keeps the
@@ -191,8 +214,8 @@ struct LyricStage: View {
     var body: some View {
         let band = size.height * Layout.bandHeight
         Group {
-            // Nothing is drawn without lyrics, before the first word, or in a long instrumental gap.
-            if let lyrics, let line = lyrics.line(at: position, alwaysDrawn: style.drawsWholeSong) {
+            // Nothing is drawn without lyrics, and most styles draw nothing before the first word or in a long gap.
+            if let lyrics, let line = lyrics.line(at: position, alwaysDrawn: style.drawsWholeSong || style.keepsCardBetweenLines) {
                 styleView(style, StyleContext(line: line, lyrics: lyrics, position: position, clock: clock, canvas: size,
                                               band: band, settings: settings, scale: style.scale(with: settings),
                                               trackTitle: trackTitle, trackArtist: trackArtist, artworkPalette: artworkPalette))

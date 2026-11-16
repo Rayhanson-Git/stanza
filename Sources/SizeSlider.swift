@@ -14,6 +14,7 @@ final class SizeSlider: NSView {
     var value: Double { didSet { needsDisplay = true; setAccessibilityValue(value) } }
     var onChange: (Double) -> Void
     private var lastSent = Date.distantPast
+    private var settle: DispatchWorkItem?
 
     init(frame: NSRect, value: Double, range: ClosedRange<Double>, onChange: @escaping (Double) -> Void) {
         self.range = range
@@ -52,6 +53,22 @@ final class SizeSlider: NSView {
         NSBezierPath(ovalIn: knob).fill()
         NSColor(white: 0, alpha: 0.25).setStroke()
         NSBezierPath(ovalIn: knob.insetBy(dx: 0.5, dy: 0.5)).stroke()
+    }
+
+    /// The mouse wheel or a two-finger swipe moves it too; the exact value follows once the scrolling stops.
+    override func scrollWheel(with event: NSEvent) {
+        let change = ScrollAdjust.change(for: event, span: range.upperBound - range.lowerBound)
+        guard change != 0 else { return }
+        value = min(max(value + change, range.lowerBound), range.upperBound)
+        settle?.cancel()
+        let now = Date()
+        if now.timeIntervalSince(lastSent) >= Self.step {
+            lastSent = now
+            onChange(value)
+        }
+        let finish = DispatchWorkItem { [weak self] in self.map { $0.onChange($0.value) } }
+        settle = finish
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.step * 2, execute: finish)
     }
 
     override func mouseDown(with event: NSEvent) { track(event, final: false) }

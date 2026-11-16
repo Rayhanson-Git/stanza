@@ -33,7 +33,7 @@ private enum FlapMetrics {
     // Timing, in seconds. A word's last tile settles at most `maxDelay + delayJitter + step * 4` (0.30 s) after it starts.
     static let step = 0.04, perCellDelay = 0.018, maxDelay = 0.12, delayJitter = 0.02, maxSpins = 3
     static let window = maxDelay + delayJitter + step * Double(maxSpins + 1)
-    static let fadeIn = 0.2, fadeOut = 0.3
+    static let fadeIn = 0.2
     static let before = 1e-6
     static let spinGlyphs = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".map(String.init)
 }
@@ -134,7 +134,8 @@ private struct FlapBoard {
         self.context = context
         let lines = context.lyrics.lines, index = context.line.index, time = context.position
         let lineStart = lines[index][0].start
-        let previousShowing = index > 0 && lineStart < (lines[index - 1].last?.end ?? 0) + Timing.lineLinger
+        // The board stays up through gaps, so every line after the first flips over the one before it.
+        let previousShowing = index > 0
         let now = Self.grid(lines, line: index, at: time)
         cells = now.cells
         currentRows = now.current
@@ -166,10 +167,7 @@ private struct FlapBoard {
         self.flips = flips
 
         let appear = previousShowing ? 1 : min(1, max(0, (time - lineStart) / FlapMetrics.fadeIn))
-        let gone = (lines[index].last?.end ?? lineStart) + Timing.lineLinger
-        let carriesOn = index + 1 < lines.count && lines[index + 1][0].start < gone
-        let leave = carriesOn ? 1 : min(1, max(0, (gone - time) / FlapMetrics.fadeOut))
-        opacity = min(appear, leave)
+        opacity = min(appear, context.gapPresence)
     }
 
     // MARK: The board's contents

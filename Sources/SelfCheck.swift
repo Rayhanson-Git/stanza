@@ -90,6 +90,16 @@ func runSelfCheck() {
     } else {
         check(false, "duet: second line should be active at 2.35 s")
     }
+    // Cards kept up through gaps dim like Messages (sample lines start at 1, 5, 9, 13, 15.5 and 30 s).
+    func gapPresence(at time: Double) -> Double? {
+        Diagnostics.sampleLyrics.line(at: time, alwaysDrawn: true).map {
+            StyleContext(line: $0, lyrics: Diagnostics.sampleLyrics, position: time, clock: 0, canvas: CGSize(width: 1440, height: 900),
+                         band: 504, settings: AppSettings.shared).gapPresence
+        }
+    }
+    check(gapPresence(at: 16).map { near($0, 1) } == true && gapPresence(at: 25).map { near($0, 0.55) } == true
+          && gapPresence(at: 28.5).map { near($0, 1) } == true && gapPresence(at: 45).map { near($0, 0) } == true,
+          "gap dimming: full while sung, 55% deep in a gap, awake before the next line, gone after the last")
     let sky = ConstellationMap(seed: 1, width: 1440, band: 504, textScale: 1)
     check(sky.stars.count == 14 && sky.stars == ConstellationMap(seed: 1, width: 1440, band: 504, textScale: 1).stars
           && sky.edges.filter { $0.to - $0.from == 1 }.count == 13, "constellation layout: 14 stars, chained, the same every time")

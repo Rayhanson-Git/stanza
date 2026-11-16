@@ -2,6 +2,12 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.2
+
+- Departure Board and Receipt now stay on screen through pauses in the song, dimming a little like Messages instead of disappearing, and come back to full strength just before the next line.
+- Every slider (Size in the menu bar menu, on the Drag Position pill and in the window, and the Timing slider) now also moves with the mouse wheel or a two-finger swipe on a trackpad.
+- Size now goes down to 25%.
+
 ## 0.4.1
 
 - **Favourites** replace pins. Star a style in the window (on the big preview or a tile) and it joins a new Favourites row above all the styles. Once you have favourites, the menu bar menu lists only those, plus the style in use and **All Styles…**, so it stays short. Anything you had pinned is already a favourite.

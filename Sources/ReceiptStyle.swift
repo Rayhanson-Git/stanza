@@ -35,7 +35,7 @@ private enum TillMetrics {
     static let shadowRadius: CGFloat = 0.8, shadowDrop: CGFloat = 0.35
     static let jitterX: CGFloat = 0.12, jitterY: CGFloat = 0.16
     // Timing, in seconds.
-    static let feed = 0.16, longestPrint = 0.8, fresh = 0.14, inkUp = 0.07, ruleDraw = 0.22, fadeIn = 0.2, fadeOut = 0.3
+    static let feed = 0.16, longestPrint = 0.8, fresh = 0.14, inkUp = 0.07, ruleDraw = 0.22, fadeIn = 0.2
     // Ink strengths.
     static let olderInk = 0.62, faintInk = 0.5, freshInk = 0.4
 
@@ -120,12 +120,9 @@ private struct TillReceipt {
         self.context = context
         let lines = context.lyrics.lines, index = context.line.index, time = context.position
         let lineStart = lines[index][0].start
-        let previousShowing = index > 0 && lineStart < (lines[index - 1].last?.end ?? 0) + Timing.lineLinger
-        let appear = previousShowing ? 1 : min(1, max(0, (time - lineStart) / TillMetrics.fadeIn))
-        let gone = (lines[index].last?.end ?? lineStart) + Timing.lineLinger
-        let carriesOn = index + 1 < lines.count && lines[index + 1][0].start < gone
-        let leave = carriesOn ? 1 : min(1, max(0, (gone - time) / TillMetrics.fadeOut))
-        opacity = min(appear, leave)
+        // The receipt fades in with the first line and then stays up through gaps, dimming like Messages.
+        let appear = index > 0 ? 1 : min(1, max(0, (time - lineStart) / TillMetrics.fadeIn))
+        opacity = min(appear, context.gapPresence)
     }
 
     private var time: Double { context.position }

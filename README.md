@@ -56,7 +56,7 @@ What you get:
 
 ## Status and limits
 
-Version 0.4.1. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+Version 0.4.2. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
 source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
@@ -150,7 +150,7 @@ runs through `LyricStage`, the same view that draws the real overlay, so what yo
 
 | Panel | What it holds |
 |---|---|
-| **Size** | The size of the whole style (words, cards and pictures), from 50% to 150%. |
+| **Size** | The size of the whole style (words, cards and pictures), from 25% to 150%. |
 | **Font** | SF Pro, SF Rounded, New York, Helvetica Neue, Avenir Next, Futura or Didot. The phone-screen styles keep the system typeface. |
 | **Lock Screen** | Show lyrics when unlocked too, or on the lock screen only. Keep the screen from sleeping while a song plays. Turn each display on or off. |
 | **Aesthetics** | Three colours (lyric text, highlight, secondary text) from the system colour picker, or colours taken from the album cover of each song. The phone-screen styles bring their own colours. |

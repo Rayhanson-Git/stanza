@@ -51,6 +51,7 @@ struct SizePanel: View {
             HStack(spacing: 12) {
                 glyph(size: 12)
                 Slider(value: $settings.textScale, in: AppSettings.textScaleRange) { Text("Size of the style") }
+                    .adjustsWithScroll($settings.textScale, in: AppSettings.textScaleRange)
                     .labelsHidden()
                     .tint(.white)
                 glyph(size: 22)

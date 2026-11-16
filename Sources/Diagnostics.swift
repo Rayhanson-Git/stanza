@@ -64,7 +64,7 @@ enum Diagnostics {
     @MainActor
     static func render(style: LyricStyle, to path: String, position: Double, size: CGSize = CGSize(width: 1440, height: 900)) -> Bool {
         let lyrics = sampleLyrics
-        guard let line = lyrics.line(at: position, alwaysDrawn: style.drawsWholeSong) else {
+        guard let line = lyrics.line(at: position, alwaysDrawn: style.drawsWholeSong || style.keepsCardBetweenLines) else {
             print("nothing is on screen at \(position)s (the overlay is blank between lines)")
             return false
         }
