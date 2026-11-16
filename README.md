@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/macOS-15%2B-0F3D3E" alt="macOS 15 or later">
   <img src="https://img.shields.io/badge/Apple%20silicon-arm64-0F3D3E" alt="Apple silicon (arm64)">
   <img src="https://img.shields.io/badge/Swift-AppKit%20%2B%20SwiftUI-2E6F73" alt="Swift, AppKit and SwiftUI">
-  <img src="https://img.shields.io/badge/styles-13-2E6F73" alt="13 styles">
+  <img src="https://img.shields.io/badge/styles-23-2E6F73" alt="23 styles">
   <img src="https://img.shields.io/badge/players-Spotify%20%7C%20Apple%20Music-2E6F73" alt="Spotify and Apple Music">
 </p>
 
@@ -35,10 +35,11 @@ Stanza is a small macOS menu-bar app for people who like to see the words of a s
 track playing in Spotify or Apple Music, finds lyrics timed to the song, and draws them over the desktop and above
 the lock screen, one word at a time, as they are sung.
 
-There are 13 ways to draw the words. Some are kinetic type: words that stack, swell and settle. Some are small motion
-scenes: a path that grows a branch per word, a spider web, a star chart, lines typed out as code. Four imitate a phone
-screen: the song arrives as a chat thread, a run of payments, a pile of lock-screen alerts, or a walk across a city
-map. A main window plays every style as a live preview, so you can pick one by watching it.
+There are 23 ways to draw the words. Some are kinetic type: words that stack, swell, stretch on held notes, write
+themselves in ink or ooze out of each other. Some are small motion scenes: a path that grows a branch per word, a spider
+web, a star chart, code, a split-flap departure board, a music staff, a marker on a lyric sheet, a printing receipt. Six
+imitate a phone screen: the song arrives as a chat thread, a run of payments, a pile of lock-screen alerts, a walk
+across a city map, a day planner or a list of voice recordings. A main window plays every style as a live preview, so you can pick one by watching it.
 
 <p align="center">
   <img src="assets/banner.png" alt="Stanza banner: the logo, the name, and four styles from the app: Messages, Map, Codestyle and Notifications" width="100%">
@@ -55,7 +56,7 @@ What you get:
 
 ## Status and limits
 
-Version 0.3.8. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+Version 0.4.0. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
 source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
@@ -90,15 +91,25 @@ runs through `LyricStage`, the same view that draws the real overlay, so what yo
 | Fisheye | Kinetic type | Three stacked words, swollen in the middle like a glass lens. |
 | Visual | Kinetic type | A centred column of words, with a small picture where one fits. |
 | Fisheye Visual | Kinetic type | The lens stack, plus pictures next to the words that earn one. |
+| Stretch | Kinetic type | Quick words snap in; held notes stretch wide, letter by letter. |
+| Ransom Note | Kinetic type | Every word is a scrap cut from a different magazine and taped down. |
+| Ink | Kinetic type | Each word writes itself with a pen stroke, then the ink soaks in. |
+| Liquid | Kinetic type | Words ooze out of one another and the line melts away at its end. |
 | Codestyle | Motion scenes | Lyrics typed out like source code behind a blinking red cursor. |
 | Codestyle Visual | Motion scenes | The code look, plus pictures next to the words that earn one. |
 | Branches | Motion scenes | A path grows across the screen and every word switches on a node. |
 | Web | Motion scenes | Each line becomes a spider web, one thread per word. |
 | Constellation | Motion scenes | Each line is joined up as a star pattern, one star per word. |
+| Departure Board | Motion scenes | A split-flap board clatters through letters until each word lands. |
+| Score | Motion scenes | Words fall under notes on a staff, each note as long as it is sung. |
+| Highlighter | Motion scenes | The line sits printed on a card and a marker swipes each word. |
+| Receipt | Motion scenes | A till prints the song, one line at a time, onto a curling receipt. |
 | Messages | Phone screens | The song arrives as a chat thread, one bubble per line. |
 | Money | Phone screens | Each line shows up as a payment, a card or a tap to pay. |
 | Notifications | Phone screens | Lines land as lock-screen alerts, piles and widgets. |
 | Map | Phone screens | A stroll through the city that drops a pin for each line. |
+| Calendar | Phone screens | The song becomes a day planner, one event for every line. |
+| Voice Memo | Phone screens | Each line is a recording, its words lighting up under the waveform. |
 
 <p align="center">
   <img src="assets/style-messages.png" alt="Messages style: lyric lines as chat bubbles" width="49%">
@@ -309,7 +320,7 @@ update.
 ## Project layout
 
 ```text
-Sources/            the app: 50 Swift files, about 12,400 lines
+Sources/            the app: 64 Swift files, about 16,500 lines
   main.swift          entry point and the command-line tools
   AppDelegate.swift   the menu-bar menu and app lifecycle
   NowPlayingMonitor.swift, PlayerLink.swift   reading the players, and the permission steps

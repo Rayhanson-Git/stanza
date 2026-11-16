@@ -54,8 +54,15 @@ enum LyricStyle: String, CaseIterable {
         case .money: return 0.81
         case .notifications: return 1.08
         case .map: return 0.69
-        // Not yet measured.
-        case .stretch, .ransomNote, .ink, .liquid, .departureBoard, .score, .highlighter, .receipt, .calendar, .voiceMemo: return 1
+        // The newer styles were drawn close to the box already; small words are not blown up past 1.2.
+        case .stretch: return 1.2
+        case .highlighter: return 1.05
+        case .ink: return 1.14
+        case .liquid: return 1.1
+        case .ransomNote: return 0.85
+        // A staff runs across the screen like Branches; trimmed so it still fits at 150%.
+        case .score: return 0.85
+        case .departureBoard, .receipt, .calendar, .voiceMemo: return 1
         }
     }
 
@@ -85,15 +92,15 @@ enum Layout {
     static let swayPerspective = 0.45
     /// Where the band's centre sits until it is moved, as a fraction of the screen measured from the top left.
     static let defaultCentre = CGPoint(x: 0.5, y: bandTop + bandHeight / 2)
-    /// How close to the sides and to the top or bottom a moved centre may go, as a fraction of the screen. Lines are
-    /// centred on it and can be wide, so the sides keep more room.
-    static let sideMargin = 0.2, endMargin = 0.12
+    /// How far past an edge a moved centre may go, as a fraction of the screen. The lyrics follow the Drag Position
+    /// card anywhere, even partly off screen (Reset Position brings them back); this only stops a stray value from
+    /// sending them somewhere no drag could reach.
+    static let overshoot = 0.5
 
-    /// Keeps a moved band on screen. `offset` is a fraction of the screen away from `defaultCentre`.
+    /// Keeps a moved band within reach. `offset` is a fraction of the screen away from `defaultCentre`.
     static func clampedOffset(_ offset: CGPoint) -> CGPoint {
-        func clamp(_ shift: Double, from centre: Double, margin: Double) -> Double { min(max(centre + shift, margin), 1 - margin) - centre }
-        return CGPoint(x: clamp(offset.x, from: defaultCentre.x, margin: sideMargin),
-                       y: clamp(offset.y, from: defaultCentre.y, margin: endMargin))
+        func clamp(_ shift: Double, from centre: Double) -> Double { min(max(centre + shift, -overshoot), 1 + overshoot) - centre }
+        return CGPoint(x: clamp(offset.x, from: defaultCentre.x), y: clamp(offset.y, from: defaultCentre.y))
     }
 }
 

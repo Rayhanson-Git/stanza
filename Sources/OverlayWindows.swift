@@ -90,6 +90,24 @@ final class OverlayController {
         window.orderFrontRegardless()
     }
 
+    /// Slides every lyrics window by `share` of its own display (from the top left), or puts them back with nil. Used
+    /// while the Drag Position card is held: moving a window is free, redrawing the style at every step is not.
+    func slide(by share: CGPoint?) {
+        // One transaction, with the lyrics redrawn at their saved spot first, so putting a window back shows no jump.
+        CATransaction.begin()
+        defer { CATransaction.commit() }
+        for screen in NSScreen.screens {
+            guard let id = Self.displayID(of: screen), let window = windows[id] else { continue }
+            let frame = screen.frame
+            guard let share else {
+                window.contentView?.layoutSubtreeIfNeeded()
+                window.setFrame(frame, display: true)
+                continue
+            }
+            window.setFrameOrigin(NSPoint(x: frame.minX + share.x * frame.width, y: frame.minY - share.y * frame.height))
+        }
+    }
+
     func applyVisibility(locked: Bool) {
         for (id, window) in windows {
             guard locked || settings.showWhenUnlocked, id != yieldingDisplay else {

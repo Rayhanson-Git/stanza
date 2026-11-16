@@ -79,7 +79,7 @@ func runSelfCheck() {
 
     // Styles
     for failure in webStyleSelfCheck() + messagesStyleSelfCheck() + notificationsStyleSelfCheck() + mapStyleSelfCheck()
-        + moneyStyleSelfCheck() {
+        + moneyStyleSelfCheck() + calendarStyleSelfCheck() + voiceMemoStyleSelfCheck() {
         check(false, failure)
     }
     let duetLyrics = TimedLyrics(tier: .wordLevel, words: duet)
@@ -98,12 +98,13 @@ func runSelfCheck() {
 
     for failure in gallerySelfCheck() { check(false, failure) }
 
-    // Moving the lyrics: a small move is kept, a wild one stops at the edge margin, and zero stays the middle.
-    let small = Layout.clampedOffset(CGPoint(x: 0.1, y: -0.2))
-    check(near(small.x, 0.1) && near(small.y, -0.2), "lyric offset: a small move is kept")
+    // Moving the lyrics: any move on screen or a little past an edge is kept, a wild one stops half a screen out, and
+    // zero stays the middle.
+    let corner = Layout.clampedOffset(CGPoint(x: -0.55, y: -0.6))
+    check(near(corner.x, -0.55) && near(corner.y, -0.6), "lyric offset: a move into a corner, even a little past it, is kept")
     let wild = Layout.clampedOffset(CGPoint(x: 5, y: -5))
-    check(near(Layout.defaultCentre.x + wild.x, 1 - Layout.sideMargin) && near(Layout.defaultCentre.y + wild.y, Layout.endMargin),
-          "lyric offset: a move past the edge stops at the margin")
+    check(near(Layout.defaultCentre.x + wild.x, 1 + Layout.overshoot) && near(Layout.defaultCentre.y + wild.y, -Layout.overshoot),
+          "lyric offset: a wild move stops half a screen past the edge")
     check(Layout.clampedOffset(.zero) == .zero, "lyric offset: zero is the middle")
 
     guard failures == 0 else {

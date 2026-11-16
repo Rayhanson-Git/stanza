@@ -2,6 +2,15 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.0
+
+- Ten new styles, for 23 in all:
+  - Kinetic type: **Stretch** (held notes stretch, "looove"), **Ransom Note** (each word a cut-out magazine scrap), **Ink** (words write themselves with a pen, then the ink soaks in) and **Liquid** (words ooze out of one another and melt away).
+  - Motion scenes: **Departure Board** (a split-flap board), **Score** (words under notes on a scrolling staff), **Highlighter** (a marker swipes each word on a printed card) and **Receipt** (a till prints the song).
+  - Phone screens: **Calendar** (a day planner, one event per line) and **Voice Memo** (each line a recording under a waveform).
+- The Drag Position card is now one slim Liquid Glass pill: the move symbol, the Size slider with its percentage, a reset icon and a round Done button.
+- Dragging is smooth: the lyrics now stay glued to the card instead of stuttering behind it, and they can go anywhere, even past the edge of the screen (Reset Position brings them back).
+
 ## 0.3.8
 
 - The Drag Position card is now really in front of the lyrics. The lyrics live in a special layer of the screen above everything else (it is how they show over the lock screen), so 0.3.7's higher window level did not help; the card now joins that layer, one step above the lyrics.

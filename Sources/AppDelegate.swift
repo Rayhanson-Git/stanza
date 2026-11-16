@@ -28,7 +28,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         GalleryModel(settings: settings, engine: engine, monitor: monitor, playerLink: playerLink, updater: updater)
     }
     private var lockMonitor: LockMonitor?
-    private lazy var placement = LyricPlacement(settings: settings) { [weak self] card in self?.overlays.raiseAboveLyrics(card) }
+    private lazy var placement = LyricPlacement(settings: settings,
+                                                raiseAboveLyrics: { [weak self] card in self?.overlays.raiseAboveLyrics(card) },
+                                                slideLyrics: { [weak self] share in self?.overlays.slide(by: share) })
     /// Puts the lyrics away once nothing has played for `idleDelay` seconds.
     private var idleTimer: DispatchWorkItem?
     private static let idleDelay = 10.0
