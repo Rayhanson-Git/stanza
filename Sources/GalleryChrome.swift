@@ -134,8 +134,19 @@ struct Hoverable<Content: View>: View {
     }
 }
 
-/// A text button in the top bar that opens a panel.
+/// Where each button of the bottom bar is, so its panel can unfold from it.
+struct MenuButtonBounds: PreferenceKey {
+    static let defaultValue: [GalleryMenu: SwiftUI.Anchor<CGRect>] = [:]
+
+    static func reduce(value: inout [GalleryMenu: SwiftUI.Anchor<CGRect>], nextValue: () -> [GalleryMenu: SwiftUI.Anchor<CGRect>]) {
+        value.merge(nextValue()) { $1 }
+    }
+}
+
+/// A text button in the bottom bar that opens a panel.
 struct MenuButton: View {
+    static let height: CGFloat = 30
+
     let title: String
     let isOpen: Bool
     let hover: GalleryHover
@@ -145,10 +156,10 @@ struct MenuButton: View {
         Hoverable(id: "menu.\(title)", hover: hover) { hovered in
             Button(action: action) {
                 Text(title)
-                    .font(.system(size: 13.5, weight: .medium))
-                    .foregroundStyle(.white.opacity(isOpen || hovered ? 1 : 0.86))
-                    .padding(.horizontal, 15)
-                    .frame(height: 36)
+                    .font(.system(size: 12.5, weight: .medium))
+                    .foregroundStyle(.white.opacity(isOpen || hovered ? 1 : 0.8))
+                    .padding(.horizontal, 13)
+                    .frame(height: Self.height)
                     .background(Color.white.opacity(isOpen ? 0.18 : hovered ? 0.08 : 0), in: Capsule())
                     .contentShape(Capsule())
             }

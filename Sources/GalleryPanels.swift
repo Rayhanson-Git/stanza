@@ -1,18 +1,26 @@
 import SwiftUI
 
-/// The glass card at the top-right that holds whichever panel is open.
+/// The glass card that holds the open panel: Settings and About at the top right, a lyric setting above
+/// its button in the bottom bar. The players have their own card, `PlayerDock`.
 struct GalleryPanel: View {
     static let width: CGFloat = 320
     static let margin: CGFloat = 18
     /// How much room the open panel takes from the hero.
     static let inset = width + margin
     static let topOffset: CGFloat = 66
-    private static let padding: CGFloat = 18
+    static let padding: CGFloat = 18
 
     let menu: GalleryMenu
     @ObservedObject var model: GalleryModel
-    /// The room under the top bar; a panel taller than this scrolls instead of running off the window.
+    /// The room it may take; a panel taller than this scrolls instead of running off the window.
     let maxHeight: CGFloat
+    /// The edge it hangs from: `.top` under the top bar, `.bottom` above the bottom bar.
+    var edge = Alignment.top
+
+    /// Left edge of a panel centred on `x`, kept `margin` inside a window `windowWidth` wide.
+    static func left(centredOn x: CGFloat, inWindow windowWidth: CGFloat) -> CGFloat {
+        min(max(x - width / 2, margin), windowWidth - margin - width)
+    }
 
     var body: some View {
         ViewThatFits(in: .vertical) {
@@ -22,7 +30,7 @@ struct GalleryPanel: View {
         .frame(width: Self.width)
         .modifier(GlassSurface(shape: RoundedRectangle(cornerRadius: 26, style: .continuous)))
         .shadow(color: .black.opacity(0.4), radius: 24, y: 10)
-        .frame(maxHeight: maxHeight, alignment: .top)
+        .frame(maxHeight: maxHeight, alignment: edge)
     }
 
     @ViewBuilder private var content: some View {
@@ -31,10 +39,7 @@ struct GalleryPanel: View {
         case .font: FontPanel(settings: model.settings, hover: model.hover)
         case .lockScreen: LockScreenPanel(settings: model.settings)
         case .aesthetics: AestheticsPanel(settings: model.settings, hover: model.hover)
-        case .spotify: PlayerPanel(player: .spotify, link: model.playerLink, monitor: model.monitor, engine: model.engine,
-                                   settings: model.settings)
-        case .music: PlayerPanel(player: .music, link: model.playerLink, monitor: model.monitor, engine: model.engine,
-                                 settings: model.settings)
+        case .spotify, .music: EmptyView() // drawn by PlayerDock
         case .settings: SettingsPanel(model: model, loginItem: model.loginItem, updater: model.updater)
         case .about: AboutPanel(model: model)
         }

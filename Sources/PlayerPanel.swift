@@ -40,42 +40,104 @@ struct StatusDot: View {
     }
 }
 
-/// The two round buttons at the right of the top bar; each opens its player's panel.
-struct PlayerButtons: View {
+/// Apple Music over Spotify in a slim vertical glass pill under the Settings gear. Hovering widens it to the
+/// left to name them; clicking one grows the pill into that player's panel, its two icons moving up into one
+/// row at the top, where the other icon switches panels and the open one closes it.
+struct PlayerDock: View {
     private enum Metrics {
         static let button: CGFloat = 36
         static let icon: CGFloat = 22
         static let dotOffset: CGFloat = 3
+        static let pillPadding: CGFloat = 4
+        static let pillRadius = button / 2 + pillPadding
+        static let cardRadius: CGFloat = 26
     }
+
+    private static let order: [Player] = [.music, .spotify]
 
     @ObservedObject var model: GalleryModel
     @ObservedObject var link: PlayerLink
     @ObservedObject var monitor: NowPlayingMonitor
+    @ObservedObject var hover: GalleryHover
+    /// The room below the gear; a taller panel scrolls.
+    let maxHeight: CGFloat
 
     var body: some View {
-        HStack(spacing: 2) {
-            ForEach(Player.allCases, id: \.self) { player in
-                button(player, health: link.health(of: player, source: monitor.player, isPlaying: monitor.isPlaying))
+        let open = model.menu?.player
+        let labelled = open == nil && hover.playerDock
+        let calm = model.settings.reduceMotion
+        // One glass shell that changes size and corners, so the pill grows into the card instead of swapping for it.
+        // Circular corners while it is a pill: continuous ones cannot reach a true capsule and leave flat ends.
+        let shell = open == nil ? RoundedRectangle(cornerRadius: Metrics.pillRadius, style: .circular)
+                                : RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous)
+        VStack(alignment: .leading, spacing: 14) {
+            icons(open: open, labelled: labelled)
+            if let open {
+                ViewThatFits(in: .vertical) {
+                    panel(open)
+                    ScrollView(.vertical) { panel(open) }.scrollIndicators(.never)
+                }
+                .id(open)
+                .transition(.opacity)
             }
         }
+        .padding(open == nil ? Metrics.pillPadding : GalleryPanel.padding)
+        .frame(width: open == nil ? nil : GalleryPanel.width, alignment: .leading)
+        // Keeps the panel inside the shell while the shell is still growing.
+        .clipShape(shell)
+        .modifier(GlassSurface(shape: shell))
+        .shadow(color: .black.opacity(open == nil ? 0 : 0.4), radius: 24, y: 10)
+        .onHover { hover.setPlayerDock($0) }
+        .animation(calm ? nil : .spring(response: 0.32, dampingFraction: 0.86), value: labelled)
+        .frame(maxHeight: maxHeight, alignment: .top)
+        // Reduce Motion: the pill and the card cross-fade instead of one growing into the other.
+        .id(calm && open != nil)
+        .transition(.opacity)
     }
 
-    private func button(_ player: Player, health: PlayerHealth) -> some View {
-        let menu = GalleryMenu(player: player)
-        let isOpen = model.menu == menu
-        return Hoverable(id: "player.\(player.rawValue)", hover: model.hover) { hovered in
-            Button { model.toggle(menu) } label: {
-                PlayerIcon(player: player, size: Metrics.icon)
-                    .overlay(alignment: .bottomTrailing) { StatusDot(health: health).offset(x: Metrics.dotOffset, y: Metrics.dotOffset) }
-                    .frame(width: Metrics.button, height: Metrics.button)
-                    .background(Color.white.opacity(isOpen ? 0.18 : hovered ? 0.08 : 0), in: Circle())
-                    .contentShape(Circle())
+    /// A column in the pill, a row at the top of the card; the same buttons move between the two.
+    private func icons(open: Player?, labelled: Bool) -> some View {
+        let layout = open == nil ? AnyLayout(VStackLayout(alignment: .leading, spacing: 0)) : AnyLayout(HStackLayout(spacing: 4))
+        return layout {
+            ForEach(Self.order, id: \.self) { player in
+                button(player, isOpen: open == player, labelled: labelled, fillsColumn: open == nil)
+            }
+        }
+        .fixedSize()
+    }
+
+    private func button(_ player: Player, isOpen: Bool, labelled: Bool, fillsColumn: Bool) -> some View {
+        let health = link.health(of: player, source: monitor.player, isPlaying: monitor.isPlaying)
+        return Hoverable(id: "player.\(player.rawValue)", hover: hover) { hovered in
+            Button { model.toggle(GalleryMenu(player: player)) } label: {
+                HStack(spacing: 2) {
+                    PlayerIcon(player: player, size: Metrics.icon)
+                        .overlay(alignment: .bottomTrailing) { StatusDot(health: health).offset(x: Metrics.dotOffset, y: Metrics.dotOffset) }
+                        .frame(width: Metrics.button, height: Metrics.button)
+                    if labelled {
+                        Text(player.displayName)
+                            .font(.system(size: 12.5, weight: .medium))
+                            .foregroundStyle(.white)
+                            .lineLimit(1)
+                            .fixedSize()
+                            .padding(.trailing, 12)
+                            .transition(.opacity)
+                    }
+                }
+                // Both rows as wide as the wider one, so their hover highlights line up.
+                .frame(maxWidth: fillsColumn ? .infinity : nil, alignment: .leading)
+                .background(Color.white.opacity(isOpen ? 0.18 : hovered ? 0.08 : 0), in: Capsule())
+                .contentShape(Capsule())
             }
             .buttonStyle(.plain)
             .help("\(player.displayName): \(health.label)")
             .accessibilityLabel("\(player.displayName), \(health.label)")
             .accessibilityAddTraits(isOpen ? .isSelected : [])
         }
+    }
+
+    private func panel(_ player: Player) -> some View {
+        PlayerPanel(player: player, link: link, monitor: monitor, engine: model.engine, settings: model.settings, showsIcon: false)
     }
 }
 
@@ -139,6 +201,8 @@ struct PlayerPanel: View {
     @ObservedObject var engine: LyricEngine
     @ObservedObject var settings: AppSettings
     var compact = false
+    /// Off in the player card, whose icon row above already shows it.
+    var showsIcon = true
 
     var body: some View {
         let health = link.health(of: player, source: monitor.player, isPlaying: monitor.isPlaying)
@@ -160,7 +224,7 @@ struct PlayerPanel: View {
 
     private func header(_ health: PlayerHealth) -> some View {
         HStack(spacing: 10) {
-            PlayerIcon(player: player, size: 28)
+            if showsIcon { PlayerIcon(player: player, size: 28) }
             VStack(alignment: .leading, spacing: 1) {
                 Text(player.displayName).font(.system(size: 15, weight: .semibold)).foregroundStyle(.white)
                 HStack(spacing: 5) {

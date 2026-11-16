@@ -1,12 +1,15 @@
 import Combine
 import SwiftUI
 
-/// The panels that can hang from the top bar. Only one is open at a time.
+/// The window's panels. Only one is open at a time.
 enum GalleryMenu: String, CaseIterable {
     case size, font, lockScreen, aesthetics, spotify, music, settings, about
 
-    /// The lyric settings in the centre of the top bar; the players and Settings sit at its right.
+    /// The lyric settings in the bar at the bottom centre; the players and Settings sit at the top right.
     static let lyricSettings: [GalleryMenu] = [.size, .font, .lockScreen, .aesthetics]
+
+    /// Unfolds above its button in the bottom bar; every other panel opens at the top right.
+    var hangsFromBottomBar: Bool { Self.lyricSettings.contains(self) }
 
     init(player: Player) { self = player == .spotify ? .spotify : .music }
 
@@ -45,6 +48,8 @@ final class GalleryHover: ObservableObject {
     @Published private(set) var control: String?
     @Published private(set) var tile: LyricStyle?
     @Published private(set) var playingTile: LyricStyle?
+    /// The pointer is over the player pill. Its own flag: the icons inside it set `control`.
+    @Published private(set) var playerDock = false
     private(set) var playingSince = Date()
     private var playStart: DispatchWorkItem?
 
@@ -54,6 +59,10 @@ final class GalleryHover: ObservableObject {
         } else if control == id {
             control = nil
         }
+    }
+
+    func setPlayerDock(_ hovered: Bool) {
+        if playerDock != hovered { playerDock = hovered }
     }
 
     func setTile(_ style: LyricStyle, hovered: Bool) {
@@ -91,7 +100,10 @@ final class GalleryModel: ObservableObject {
 
     @Published private(set) var browsed: LyricStyle
     @Published private(set) var heroSince: Date
-    @Published var menu: GalleryMenu?
+    @Published var menu: GalleryMenu? {
+        // The card shrinks back to the pill away from the pointer, and no hover exit may follow.
+        didSet { if oldValue?.player != menu?.player { hover.setPlayerDock(false) } }
+    }
     /// The window cannot be seen (hidden, covered, minimised, app in the background, screen locked).
     @Published var suspended = false { didSet { applyPause() } }
     @Published private(set) var scrolling = false { didSet { applyPause() } }

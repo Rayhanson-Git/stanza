@@ -57,7 +57,7 @@ struct GalleryHeroStage: View {
 
     var body: some View {
         let style = model.browsed
-        let width = size.width - (model.menu == nil ? 0 : GalleryPanel.inset)
+        let width = size.width - (model.menu?.hangsFromBottomBar == false ? GalleryPanel.inset : 0)
         let geometry = HeroGeometry(heroHeight: size.height, style: style, mapFillsDisplay: settings.mapFillsDisplay)
         let stage = CGSize(width: min(width, geometry.screenHeight * HeroGeometry.maxAspect), height: geometry.screenHeight)
         ZStack(alignment: .topLeading) {
@@ -126,7 +126,7 @@ struct GalleryHeroControls: View {
             chevron("chevron.compact.right", "Next style") { model.step(1) }
         }
         .padding(.horizontal, 14)
-        .padding(.trailing, model.menu == nil ? 0 : GalleryPanel.inset)
+        .padding(.trailing, model.menu?.hangsFromBottomBar == false ? GalleryPanel.inset : 0)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .offset(y: -Metrics.chevronLift * size.height)
     }

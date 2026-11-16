@@ -2,6 +2,12 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.3
+
+- The Size, Font, Lock Screen and Aesthetics buttons now sit in a slim pill floating at the bottom of the window, and each panel rolls up out of the button that opened it.
+- Apple Music and Spotify sit in a slim vertical pill under the Settings gear. Point at it and it widens to show their names; click one and the whole pill grows into that player's panel, with both icons side by side across the top.
+- The README is rebuilt, with an architecture guide (docs/ARCHITECTURE.md) and a guide to every style and why it is designed the way it is (docs/STYLES.md).
+
 ## 0.4.2
 
 - Departure Board and Receipt now stay on screen through pauses in the song, dimming a little like Messages instead of disappearing, and come back to full strength just before the next line.

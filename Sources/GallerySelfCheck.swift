@@ -89,6 +89,9 @@ private func pinAndLayoutChecks() -> [String] {
     let fullMap = HeroGeometry(heroHeight: 592, style: .map, mapFillsDisplay: true)
     checks.check(fullMap.framed && near(fullMap.screenHeight, 274) && near(fullMap.offsetY, 86),
                  "hero: a display-filling map is shown as a whole framed screen")
+    // A bottom-bar panel (320 wide) centres on its button but stays 18 pt inside a 940 pt window.
+    checks.check(GalleryPanel.left(centredOn: 470, inWindow: 940) == 310 && GalleryPanel.left(centredOn: 40, inWindow: 940) == 18
+                 && GalleryPanel.left(centredOn: 930, inWindow: 940) == 602, "bottom-bar panels centre on their button, clamped inside the window")
     checks.check(Diagnostics.size(from: "940x620") == CGSize(width: 940, height: 620) && Diagnostics.size(from: "wide") == nil,
                  "render size parsing")
     return checks.failures
