@@ -2,6 +2,13 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.3.5
+
+- **Move Lyrics**, in the menu bar menu: a card appears where the lyrics sit; drag it anywhere and click Done (or choose Move Lyrics again). The spot is kept on every display and on the lock screen. **Reset Lyrics Position** puts them back in the middle.
+- When the music has been paused for 10 seconds, the lyrics fade away instead of staying on the paused line. They come back the moment it plays again.
+- A click anywhere else in the Stanza window now closes an open panel, as well as doing what it would anyway.
+- The menu's size slider is now called **Size**, since it scales the whole style, not just the words. It is drawn in colour and no longer stutters while you drag it.
+
 ## 0.3.4
 
 - **About Stanza**, at the foot of Settings: the version, who made Stanza, and links to the portfolio at rayhanson.tech, the source on GitHub and what's new.

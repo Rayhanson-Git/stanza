@@ -75,7 +75,9 @@ enum Diagnostics {
         if !mapArrived { print("map roads and pictures did not arrive within \(Int(mapTimeout)) s; drawing what there is") }
         let view = ZStack {
             LinearGradient(colors: [Color(white: 0.16), Color(white: 0.05)], startPoint: .top, endPoint: .bottom)
+            // A moved position (Move Lyrics, or a -lyricOffsetX/-lyricOffsetY override) shifts the band as the overlay does.
             styleView(style, context).frame(width: size.width, height: context.band)
+                .offset(x: size.width * settings.lyricOffset(for: style).x, y: size.height * settings.lyricOffset(for: style).y)
         }
         .frame(width: size.width, height: size.height)
         let renderer = ImageRenderer(content: view)

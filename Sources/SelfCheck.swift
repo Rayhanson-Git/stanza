@@ -98,6 +98,14 @@ func runSelfCheck() {
 
     for failure in gallerySelfCheck() { check(false, failure) }
 
+    // Moving the lyrics: a small move is kept, a wild one stops at the edge margin, and zero stays the middle.
+    let small = Layout.clampedOffset(CGPoint(x: 0.1, y: -0.2))
+    check(near(small.x, 0.1) && near(small.y, -0.2), "lyric offset: a small move is kept")
+    let wild = Layout.clampedOffset(CGPoint(x: 5, y: -5))
+    check(near(Layout.defaultCentre.x + wild.x, 1 - Layout.sideMargin) && near(Layout.defaultCentre.y + wild.y, Layout.endMargin),
+          "lyric offset: a move past the edge stops at the margin")
+    check(Layout.clampedOffset(.zero) == .zero, "lyric offset: zero is the middle")
+
     guard failures == 0 else {
         print("self-check: \(failures) failure(s)")
         exit(1)

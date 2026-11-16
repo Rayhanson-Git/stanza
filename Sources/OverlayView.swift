@@ -45,6 +45,18 @@ enum Layout {
     static let swayPitchDegrees = 7.0, swayPitchSpeed = 0.22
     static let swayScale = 0.035, swayScaleSpeed = 0.17
     static let swayPerspective = 0.45
+    /// Where the band's centre sits until it is moved, as a fraction of the screen measured from the top left.
+    static let defaultCentre = CGPoint(x: 0.5, y: bandTop + bandHeight / 2)
+    /// How close to the sides and to the top or bottom a moved centre may go, as a fraction of the screen. Lines are
+    /// centred on it and can be wide, so the sides keep more room.
+    static let sideMargin = 0.2, endMargin = 0.12
+
+    /// Keeps a moved band on screen. `offset` is a fraction of the screen away from `defaultCentre`.
+    static func clampedOffset(_ offset: CGPoint) -> CGPoint {
+        func clamp(_ shift: Double, from centre: Double, margin: Double) -> Double { min(max(centre + shift, margin), 1 - margin) - centre }
+        return CGPoint(x: clamp(offset.x, from: defaultCentre.x, margin: sideMargin),
+                       y: clamp(offset.y, from: defaultCentre.y, margin: endMargin))
+    }
 }
 
 /// Everything a style needs to draw one frame.
@@ -110,6 +122,8 @@ private struct Sway: ViewModifier {
 /// Which displays the overlay currently gives up to the Stanza window, so lyrics never sit on top of it.
 final class OverlayPresence: ObservableObject {
     @Published var yielding: Set<UInt32> = []
+    /// Nothing has played for a while, so the lyrics are put away instead of hanging on the paused line.
+    @Published var idle = false
 }
 
 /// One frame of a style, placed in the lyric band of a screen-sized canvas. The live overlay and the
@@ -124,6 +138,8 @@ struct LyricStage: View {
     var trackTitle = ""
     var trackArtist = ""
     var artworkPalette: [NSColor]?
+    /// Where the user moved the lyrics, as a fraction of the screen; previews in the window leave it at zero.
+    var offset = CGPoint.zero
 
     var body: some View {
         let band = size.height * Layout.bandHeight
@@ -137,7 +153,7 @@ struct LyricStage: View {
         }
         .frame(width: size.width, height: band)
         .modifier(Sway(amount: style.sway, clock: clock))
-        .position(x: size.width / 2, y: size.height * Layout.bandTop + band / 2)
+        .position(x: size.width * (Layout.defaultCentre.x + offset.x), y: size.height * (Layout.defaultCentre.y + offset.y))
     }
 }
 
@@ -153,14 +169,17 @@ struct LyricOverlayView: View {
     var body: some View {
         GeometryReader { geometry in
             // Redrawing every frame is only needed while lyrics are moving and can be seen; otherwise the overlay costs nothing.
-            TimelineView(.animation(paused: engine.lyrics == nil || !monitor.isPlaying || isYielding)) { timeline in
+            TimelineView(.animation(paused: engine.lyrics == nil || !monitor.isPlaying || isYielding || presence.idle)) { timeline in
                 LyricStage(style: settings.style, lyrics: engine.lyrics, position: engine.position(at: timeline.date),
                            clock: timeline.date.timeIntervalSinceReferenceDate, size: geometry.size, settings: settings,
                            trackTitle: monitor.track?.title ?? "", trackArtist: monitor.track?.artist ?? "",
-                           artworkPalette: artwork.palette)
+                           artworkPalette: artwork.palette, offset: settings.lyricOffset(for: settings.style))
             }
         }
         .ignoresSafeArea()
+        // Fades away after a long pause, and is back the instant music plays again.
+        .opacity(presence.idle ? 0 : 1)
+        .animation(presence.idle ? .easeOut(duration: 0.8) : nil, value: presence.idle)
     }
 
     private var isYielding: Bool { display.map(presence.yielding.contains) ?? false }

@@ -58,6 +58,9 @@ struct GalleryView: View {
                         withAnimation(.easeInOut(duration: 0.45)) { proxy.scrollTo(Metrics.heroAnchor, anchor: .top) }
                     }
                 }
+                // A click anywhere in the page closes an open panel; the click still does its own job too.
+                .contentShape(Rectangle())
+                .simultaneousGesture(TapGesture().onEnded { if model.menu != nil { model.menu = nil } })
             }
             .scrollIndicators(.never)
             .onScrollGeometryChange(for: Bool.self) { $0.contentOffset.y > hero.height * Metrics.heroGoneShare } action: { _, gone in

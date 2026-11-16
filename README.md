@@ -55,7 +55,7 @@ What you get:
 
 ## Status and limits
 
-Version 0.3.4. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+Version 0.3.5. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
 source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
@@ -129,7 +129,7 @@ runs through `LyricStage`, the same view that draws the real overlay, so what yo
 
 | Panel | What it holds |
 |---|---|
-| **Size** | Lyric size from 50% to 150%. |
+| **Size** | The size of the whole style (words, cards and pictures), from 50% to 150%. |
 | **Font** | SF Pro, SF Rounded, New York, Helvetica Neue, Avenir Next, Futura or Didot. The phone-screen styles keep the system typeface. |
 | **Lock Screen** | Show lyrics when unlocked too, or on the lock screen only. Keep the screen from sleeping while a song plays. Turn each display on or off. |
 | **Aesthetics** | Three colours (lyric text, highlight, secondary text) from the system colour picker, or colours taken from the album cover of each song. The phone-screen styles bring their own colours. |
@@ -142,6 +142,7 @@ Other details:
 - Styles can be pinned; pinned styles are listed first in the menu-bar menu.
 - With macOS "Reduce motion" on, styles drop their decorative wobble.
 - The overlay steps aside on the display where the Stanza window is open, so lyrics never play over their own previews.
+- When the music has been paused for 10 seconds the lyrics fade away; they come back as soon as it plays.
 - A short first-run introduction in the window covers the player, the permission and the choice of style.
 
 ## Install
@@ -194,7 +195,8 @@ The menu-bar icon is the logo mark. Its menu has:
 - **Styles**: every style, grouped as Kinetic type, Motion scenes and Phone screens, with any pinned styles first.
   The style in use is ticked.
 - **Keep Screen Awake** and **Show When Unlocked**
-- **Text Size**: a slider with a Reset button
+- **Move Lyrics**: shows a card to drag the lyrics anywhere on screen; **Reset Lyrics Position** puts them back in the middle
+- **Size**: a slider for the size of the whole style, with a Reset button
 - **Displays**: one item per connected display, to turn the lyrics on or off there
 - **Check for Updates…**, which reads **Restart to Update** while a downloaded update waits
 - **Quit Stanza**

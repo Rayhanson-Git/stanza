@@ -28,8 +28,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         GalleryModel(settings: settings, engine: engine, monitor: monitor, playerLink: playerLink, updater: updater)
     }
     private var lockMonitor: LockMonitor?
+    private lazy var placement = LyricPlacement(settings: settings)
+    /// Puts the lyrics away once nothing has played for `idleDelay` seconds.
+    private var idleTimer: DispatchWorkItem?
+    private static let idleDelay = 10.0
     private var observers: Set<AnyCancellable> = []
     private weak var textScaleSlider: NSSlider?
+    private var pendingScale: Double?
+    private var scaleQueued = false
+    private static let scaleStep = 0.05
 
     private var isLocked: Bool { lockMonitor?.isLocked ?? LockMonitor.currentlyLocked() }
 
@@ -56,6 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         buildMainMenu()
         updater.start()
         lockMonitor = LockMonitor { [weak self] locked in
+            if locked { self?.placement.end() }
             self?.gallery.locked = locked
             self?.applyPresence()
             self?.refreshScreenAwake()
@@ -65,10 +73,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)
             .merge(with: settings.$disabledDisplays.dropFirst().map { _ in Notification(name: .init("displays")) })
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] _ in self.map { $0.overlays.rebuild(locked: $0.isLocked) } }
+            .sink { [weak self] _ in
+                guard let self else { return }
+                placement.end()
+                overlays.rebuild(locked: isLocked)
+            }
             .store(in: &observers)
         settings.$showWhenUnlocked.dropFirst().receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self.map { $0.overlays.applyVisibility(locked: $0.isLocked) } }
+            .store(in: &observers)
+        monitor.$isPlaying.removeDuplicates().receive(on: DispatchQueue.main)
+            .sink { [weak self] playing in self?.playingChanged(playing) }
             .store(in: &observers)
         monitor.$isPlaying.combineLatest(settings.$keepScreenAwake, settings.$showWhenUnlocked).receive(on: DispatchQueue.main)
             .sink { [weak self] _ in self?.refreshScreenAwake() }
@@ -97,6 +112,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         if presence.yielding != displays { presence.yielding = displays }
         overlays.yieldingDisplay = yielding
         overlays.applyVisibility(locked: locked)
+    }
+
+    /// Music stopped: put the lyrics away after a while instead of leaving the paused line on screen. Playing
+    /// again brings them back at once.
+    private func playingChanged(_ playing: Bool) {
+        idleTimer?.cancel()
+        guard !playing else {
+            if presence.idle { presence.idle = false }
+            return
+        }
+        let timer = DispatchWorkItem { [weak self] in self?.presence.idle = true }
+        idleTimer = timer
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.idleDelay, execute: timer)
     }
 
     /// The display is only kept awake while lyrics can actually be seen.
@@ -136,9 +164,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(item("Keep Screen Awake", #selector(toggleKeepAwake)))
         menu.addItem(item("Show When Unlocked", #selector(toggleShowWhenUnlocked)))
+        menu.addItem(item("Move Lyrics", #selector(toggleMoveLyrics)))
+        menu.addItem(item("Reset Lyrics Position", #selector(resetLyricsPosition)))
         menu.addItem(.separator())
 
-        menu.addItem(header("Text Size"))
+        // It scales the whole style, not only the words, so it is "Size", as in the window.
+        menu.addItem(header("Size"))
         let textScale = sliderItem(settings.textScale, AppSettings.textScaleRange, #selector(textScaleChanged(_:)), #selector(resetTextScale))
         textScaleSlider = textScale.slider
         menu.addItem(textScale.item)
@@ -196,6 +227,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             switch menuItem.action {
             case #selector(toggleKeepAwake): menuItem.state = settings.keepScreenAwake ? .on : .off
             case #selector(toggleShowWhenUnlocked): menuItem.state = settings.showWhenUnlocked ? .on : .off
+            case #selector(toggleMoveLyrics): menuItem.state = placement.isActive ? .on : .off
+            case #selector(resetLyricsPosition): menuItem.isEnabled = settings.lyricOffset != .zero
             case #selector(runUpdater):
                 menuItem.title = updater.actionTitle
                 menuItem.isEnabled = updater.canAct
@@ -235,6 +268,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private func sliderItem(_ value: Double, _ range: ClosedRange<Double>, _ action: Selector, _ reset: Selector) -> (item: NSMenuItem, slider: NSSlider) {
         let slider = NSSlider(value: value, minValue: range.lowerBound, maxValue: range.upperBound, target: self, action: action)
         slider.isContinuous = true
+        // A menu never becomes the active window, so without this the slider is drawn grey, as if switched off.
+        slider.trackFillColor = .controlAccentColor
+        slider.toolTip = "Scales the whole style: words, cards and pictures"
         slider.frame = NSRect(x: 14, y: 4, width: 158, height: 22)
         let resetButton = NSButton(title: "Reset", target: self, action: reset)
         resetButton.bezelStyle = .rounded
@@ -257,9 +293,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func showGallery() { gallery.show() }
     @objc private func runUpdater() { updater.act() }
+    @objc private func toggleMoveLyrics() { placement.isActive ? placement.end() : placement.begin() }
+    @objc private func resetLyricsPosition() { placement.reset() }
     @objc private func toggleKeepAwake() { settings.keepScreenAwake.toggle() }
     @objc private func toggleShowWhenUnlocked() { settings.showWhenUnlocked.toggle() }
-    @objc private func textScaleChanged(_ sender: NSSlider) { settings.textScale = sender.doubleValue }
+    /// Every change redraws each visible style, so while dragging the size is applied at most `scaleStep` apart, and the
+    /// exact value on release. Applying every tick could make the slider stutter or seem stuck.
+    @objc private func textScaleChanged(_ sender: NSSlider) {
+        pendingScale = sender.doubleValue
+        if NSApp.currentEvent?.type == .leftMouseUp {
+            applyPendingScale()
+        } else if !scaleQueued {
+            scaleQueued = true
+            perform(#selector(applyPendingScale), with: nil, afterDelay: Self.scaleStep, inModes: [.eventTracking, .default])
+        }
+    }
+
+    @objc private func applyPendingScale() {
+        scaleQueued = false
+        guard let scale = pendingScale else { return }
+        pendingScale = nil
+        if settings.textScale != scale { settings.textScale = scale }
+    }
 
     @objc private func resetTextScale() {
         settings.textScale = 1

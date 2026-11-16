@@ -72,6 +72,7 @@ final class AppSettings: ObservableObject {
         static let showWhenUnlocked = "showWhenUnlocked", disabledDisplays = "disabledDisplays"
         static let mapIn3D = "mapIn3D", mapFillsDisplay = "mapFillsDisplay"
         static let pinnedStyles = "pinnedStyles", onboardingDone = "onboardingDone"
+        static let lyricOffsetX = "lyricOffsetX", lyricOffsetY = "lyricOffsetY"
     }
 
     private let defaults = UserDefaults.standard
@@ -90,6 +91,16 @@ final class AppSettings: ObservableObject {
     @Published private(set) var pinnedStyles: Set<LyricStyle> {
         didSet { defaults.set(Self.rawPins(pinnedStyles), forKey: Key.pinnedStyles) }
     }
+    /// Where the lyrics were moved to, as a fraction of the screen away from the middle (Move Lyrics in the menu).
+    /// Set it through `Layout.clampedOffset` so the lyrics can never be lost off screen.
+    @Published var lyricOffset: CGPoint {
+        didSet {
+            defaults.set(lyricOffset.x, forKey: Key.lyricOffsetX)
+            defaults.set(lyricOffset.y, forKey: Key.lyricOffsetY)
+        }
+    }
+    /// The Map style filling the whole display has nowhere to move to, so it stays put.
+    func lyricOffset(for style: LyricStyle) -> CGPoint { style == .map && mapFillsDisplay ? .zero : lyricOffset }
     /// False until the first-run introduction in the window has been finished once.
     @Published var onboardingDone: Bool { didSet { defaults.set(onboardingDone, forKey: Key.onboardingDone) } }
     /// The system "Reduce motion" accessibility setting; styles drop their decorative wobble when it is on.
@@ -129,6 +140,7 @@ final class AppSettings: ObservableObject {
         disabledDisplays = Set((defaults.stringArray(forKey: Key.disabledDisplays) ?? []).compactMap(UInt32.init))
         pinnedStyles = Self.pins(from: defaults.stringArray(forKey: Key.pinnedStyles) ?? [])
         onboardingDone = bool(Key.onboardingDone, default: false)
+        lyricOffset = Layout.clampedOffset(CGPoint(x: defaults.double(forKey: Key.lyricOffsetX), y: defaults.double(forKey: Key.lyricOffsetY)))
         reloadStoredColors()
     }
 

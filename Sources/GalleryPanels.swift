@@ -50,7 +50,7 @@ struct SizePanel: View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
                 glyph(size: 12)
-                Slider(value: $settings.textScale, in: AppSettings.textScaleRange) { Text("Lyric size") }
+                Slider(value: $settings.textScale, in: AppSettings.textScaleRange) { Text("Size of the style") }
                     .labelsHidden()
                     .tint(.white)
                 glyph(size: 22)
