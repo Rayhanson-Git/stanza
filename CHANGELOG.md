@@ -2,6 +2,10 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.3.8
+
+- The Drag Position card is now really in front of the lyrics. The lyrics live in a special layer of the screen above everything else (it is how they show over the lock screen), so 0.3.7's higher window level did not help; the card now joins that layer, one step above the lyrics.
+
 ## 0.3.7
 
 - Every style is now the same size at the same Size setting. Each one was measured and balanced to fill about the same part of the screen, and Size now scales every style the same way. The Map in particular is much smaller and now shrinks and grows with Size (when it fills the whole display it stays full-screen). Because of this, a Size you set before may look different now.

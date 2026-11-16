@@ -83,6 +83,13 @@ final class OverlayController {
         applyVisibility(locked: locked)
     }
 
+    /// Puts `window` in the lyrics' own window-server layer, the one above the lock screen. Nothing outside that layer
+    /// can sit in front of the lyrics, whatever its window level, so the Drag Position card joins it.
+    func raiseAboveLyrics(_ window: NSWindow) {
+        lockScreenSpace?.adopt(window)
+        window.orderFrontRegardless()
+    }
+
     func applyVisibility(locked: Bool) {
         for (id, window) in windows {
             guard locked || settings.showWhenUnlocked, id != yieldingDisplay else {

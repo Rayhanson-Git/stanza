@@ -7,13 +7,18 @@ final class LyricPlacement: NSObject, NSWindowDelegate {
     private static let cardSize = NSSize(width: 340, height: 150)
 
     private let settings: AppSettings
+    /// Moves the card into the lyrics' layer; a window level alone cannot get it in front of them.
+    private let raiseAboveLyrics: (NSWindow) -> Void
     private var panel: NSPanel?
     /// True while the card is being moved by code, so that move is not read back as a drag (rounding would leave a
     /// tiny offset behind, and Reset would never quite reach the middle).
     private var placingByCode = false
     var isActive: Bool { panel != nil }
 
-    init(settings: AppSettings) { self.settings = settings }
+    init(settings: AppSettings, raiseAboveLyrics: @escaping (NSWindow) -> Void) {
+        self.settings = settings
+        self.raiseAboveLyrics = raiseAboveLyrics
+    }
 
     func begin() {
         // The display with the menu bar, where the menu that started this was clicked.
@@ -23,8 +28,8 @@ final class LyricPlacement: NSObject, NSWindowDelegate {
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
-        // One above the lyrics, so even large lyrics never cover it. That is also above menus, which is fine for a
-        // small card that goes away on Done. Never on the lock screen.
+        // One above the lyrics within their layer, so even large lyrics never cover it. That is also above menus,
+        // which is fine for a small card that goes away on Done (and on screen lock).
         panel.level = NSWindow.Level(rawValue: OverlayController.level.rawValue + 1)
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.hidesOnDeactivate = false
@@ -36,6 +41,7 @@ final class LyricPlacement: NSObject, NSWindowDelegate {
         place(panel, on: screen)
         panel.delegate = self
         panel.orderFrontRegardless()
+        raiseAboveLyrics(panel)
         log("drag position: on")
     }
 
