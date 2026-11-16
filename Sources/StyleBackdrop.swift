@@ -18,6 +18,16 @@ extension LyricStyle {
         case .money: hex = [0x041409, 0x0B3D1C, 0x1F9150, 0xD4E66A]
         case .notifications: hex = [0x170D2E, 0x3F2470, 0xB0508A, 0xF5B971]
         case .map: hex = [0x0D1520, 0x1F3044, 0x3F6B6F, 0xE0B87A]
+        case .stretch: hex = [0x1A0A0A, 0x5C1A1A, 0xC0392B, 0xFFD3B6]
+        case .ransomNote: hex = [0x15120C, 0x3D3423, 0x8C7A55, 0xF2E6C9]
+        case .ink: hex = [0x0A0E1A, 0x16223F, 0x2D4A7A, 0xD9E4F5]
+        case .liquid: hex = [0x05161A, 0x0D3D45, 0x1A8C8C, 0x9FF0E0]
+        case .departureBoard: hex = [0x0B0B0B, 0x22262B, 0x3A4552, 0xF2C94C]
+        case .score: hex = [0x120F0A, 0x2E2718, 0x6B5B3A, 0xEDE3CC]
+        case .highlighter: hex = [0x0F140A, 0x2A3A14, 0x7A9A2A, 0xF5F27A]
+        case .receipt: hex = [0x111111, 0x2B2B2B, 0x5A5A5A, 0xF0EDE6]
+        case .calendar: hex = [0x08101F, 0x14284D, 0x3D6FD1, 0xFF8A65]
+        case .voiceMemo: hex = [0x140A1A, 0x3A1A4A, 0x8A3FB0, 0xFF6B6B]
         }
         return hex.map { Color(.sRGB, red: Double($0 >> 16 & 0xFF) / 255, green: Double($0 >> 8 & 0xFF) / 255, blue: Double($0 & 0xFF) / 255) }
     }

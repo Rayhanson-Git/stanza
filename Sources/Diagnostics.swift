@@ -110,5 +110,15 @@ func styleView(_ style: LyricStyle, _ context: StyleContext) -> some View {
     case .money: MoneyStyle(context: context)
     case .notifications: NotificationsStyle(context: context)
     case .map: MapStyle(context: context)
+    case .stretch: StretchStyle(context: context)
+    case .ransomNote: RansomNoteStyle(context: context)
+    case .ink: InkStyle(context: context)
+    case .liquid: LiquidStyle(context: context)
+    case .departureBoard: DepartureBoardStyle(context: context)
+    case .score: ScoreStyle(context: context)
+    case .highlighter: HighlighterStyle(context: context)
+    case .receipt: ReceiptStyle(context: context)
+    case .calendar: CalendarStyle(context: context)
+    case .voiceMemo: VoiceMemoStyle(context: context)
     }
 }

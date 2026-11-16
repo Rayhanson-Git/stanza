@@ -5,21 +5,31 @@ enum LyricStyle: String, CaseIterable {
     case fisheye = "Fisheye"
     case visual = "Visual"
     case fisheyeVisual = "Fisheye Visual"
+    case stretch = "Stretch"
+    case ransomNote = "Ransom Note"
+    case ink = "Ink"
+    case liquid = "Liquid"
     case codestyle = "Codestyle"
     case codestyleVisual = "Codestyle Visual"
     case branches = "Branches"
     case web = "Web"
     case constellation = "Constellation"
+    case departureBoard = "Departure Board"
+    case score = "Score"
+    case highlighter = "Highlighter"
+    case receipt = "Receipt"
     // The "phone screen" styles: each lyric line arrives as a message, a payment, a notification or a map turn.
     case messages = "Messages"
     case money = "Money"
     case notifications = "Notifications"
     case map = "Map"
+    case calendar = "Calendar"
+    case voiceMemo = "Voice Memo"
 
     /// These styles show history and react to gaps, so they are drawn for the whole song, not just while a line is sung.
     var drawsWholeSong: Bool {
         switch self {
-        case .messages, .money, .notifications, .map: return true
+        case .messages, .money, .notifications, .map, .calendar, .voiceMemo: return true
         default: return false
         }
     }
@@ -44,6 +54,8 @@ enum LyricStyle: String, CaseIterable {
         case .money: return 0.81
         case .notifications: return 1.08
         case .map: return 0.69
+        // Not yet measured.
+        case .stretch, .ransomNote, .ink, .liquid, .departureBoard, .score, .highlighter, .receipt, .calendar, .voiceMemo: return 1
         }
     }
 

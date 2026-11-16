@@ -7,9 +7,10 @@ extension LyricStyle {
 
     var category: String {
         switch self {
-        case .ship, .fisheye, .visual, .fisheyeVisual: return "Kinetic type"
-        case .codestyle, .codestyleVisual, .branches, .web, .constellation: return "Motion scenes"
-        case .messages, .money, .notifications, .map: return "Phone screens"
+        case .ship, .fisheye, .visual, .fisheyeVisual, .stretch, .ransomNote, .ink, .liquid: return "Kinetic type"
+        case .codestyle, .codestyleVisual, .branches, .web, .constellation, .departureBoard, .score, .highlighter, .receipt:
+            return "Motion scenes"
+        case .messages, .money, .notifications, .map, .calendar, .voiceMemo: return "Phone screens"
         }
     }
 
@@ -28,6 +29,16 @@ extension LyricStyle {
         case .money: return "Each line shows up as a payment, a card or a tap to pay."
         case .notifications: return "Lines land as lock-screen alerts, piles and widgets."
         case .map: return "A stroll through the city that drops a pin for each line."
+        case .stretch: return "Quick words snap in; held notes stretch wide, letter by letter."
+        case .ransomNote: return "Every word is a scrap cut from a different magazine and taped down."
+        case .ink: return "Each word writes itself with a pen stroke, then the ink soaks in."
+        case .liquid: return "Words ooze out of one another and the line melts away at its end."
+        case .departureBoard: return "A split-flap board clatters through letters until each word lands."
+        case .score: return "Words fall under notes on a staff, each note as long as it is sung."
+        case .highlighter: return "The line sits printed on a card and a marker swipes each word."
+        case .receipt: return "A till prints the song, one line at a time, onto a curling receipt."
+        case .calendar: return "The song becomes a day planner, one event for every line."
+        case .voiceMemo: return "Each line is a recording, its words lighting up under the waveform."
         }
     }
 
@@ -51,6 +62,11 @@ extension LyricStyle {
         case .visual, .branches, .constellation, .money, .notifications: return 4
         case .codestyle, .map: return 6
         case .fisheyeVisual, .web: return 8
+        case .stretch, .score: return 0
+        case .ransomNote, .highlighter: return 2
+        case .ink, .receipt: return 4
+        case .liquid, .calendar: return 6
+        case .departureBoard, .voiceMemo: return 8
         }
     }
 }

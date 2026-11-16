@@ -72,11 +72,13 @@ private func pinAndLayoutChecks() -> [String] {
                  && plainMenu.flatMap(\.styles) == LyricStyle.allCases,
                  "the menu lists every style by category, with pinned styles first when there are any")
 
-    checks.check(GalleryModel.stepped(from: .ship, by: -1) == .map && GalleryModel.stepped(from: .map, by: 1) == .ship
-                 && GalleryModel.stepped(from: .fisheye, by: 1) == .visual, "stepping wraps around the 13 styles")
     let styles = LyricStyle.allCases
-    checks.check(styles.prefix(4).allSatisfy { $0.category == "Kinetic type" } && styles[4...8].allSatisfy { $0.category == "Motion scenes" }
-                 && styles.suffix(4).allSatisfy { $0.category == "Phone screens" && $0.isPhoneScreen }, "categories follow gallery order")
+    checks.check(GalleryModel.stepped(from: .ship, by: -1) == styles.last && GalleryModel.stepped(from: styles.last!, by: 1) == .ship
+                 && GalleryModel.stepped(from: .fisheye, by: 1) == .visual, "stepping wraps around all the styles")
+    // Each category is one unbroken run in gallery order, and the phone screens close it.
+    let runs = styles.map(\.category).reduce(into: [String]()) { runs, category in if runs.last != category { runs.append(category) } }
+    checks.check(runs == ["Kinetic type", "Motion scenes", "Phone screens"]
+                 && styles.filter { $0.category == "Phone screens" }.allSatisfy(\.isPhoneScreen), "categories follow gallery order")
     // Free area 592 − 52 − 156 − 24 − 86 = 274: the lyric band (28 %…84 % of the virtual screen) must land exactly on it.
     let hero = HeroGeometry(heroHeight: 592, style: .ship, mapFillsDisplay: false)
     checks.check(near(hero.offsetY + 0.28 * hero.screenHeight, 86) && near(0.56 * hero.screenHeight, 274) && !hero.framed,
