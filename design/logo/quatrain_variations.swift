@@ -311,11 +311,13 @@ func writeIconset(to folder: String) {
     }
 }
 
-/// The 18-point menu-bar mark at 1x and 2x; the app marks it as a template so macOS tints it.
+/// The menu-bar mark at 1x and 2x; the app marks it as a template so macOS tints it. 15 points tall, a little
+/// under the 18-point slot, so its three bars sit at the weight of the system icons beside it.
 @MainActor
 func writeMenuBarGlyph(to folder: String) {
-    write(MenuBarGlyph(height: 18), to: "\(folder)/StanzaMenuBar.png")
-    write(MenuBarGlyph(height: 18), to: "\(folder)/StanzaMenuBar@2x.png", scale: 2)
+    let height: CGFloat = 15
+    write(MenuBarGlyph(height: height), to: "\(folder)/StanzaMenuBar.png")
+    write(MenuBarGlyph(height: height), to: "\(folder)/StanzaMenuBar@2x.png", scale: 2)
 }
 
 let arguments = CommandLine.arguments
