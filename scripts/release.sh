@@ -58,12 +58,11 @@ hdiutil create -quiet -srcfolder "$stage" -volname "$VOLUME" -fs HFS+ -format UD
 # 2. Lay out the window in Finder. A failure here only costs the layout, never the release.
 hdiutil attach -quiet -readwrite -noverify -noautoopen -mountpoint "/Volumes/$VOLUME" "$OUT/rw.dmg"
 mounted=true
-# The disk's own icon, and "Stanza" rather than "Stanza.app" under the app.
+# The disk's own icon. The app itself gets no Finder flags: they would fail macOS's strict signature check.
 if command -v SetFile >/dev/null; then
     SetFile -a C "/Volumes/$VOLUME" || echo "could not set the disk icon"
-    SetFile -a E "/Volumes/$VOLUME/Stanza.app" || echo "could not hide the .app extension"
 else
-    echo "SetFile missing: the disk keeps the plain icon and the .app label"
+    echo "SetFile missing: the disk keeps the plain icon"
 fi
 perl -e 'alarm 60; exec @ARGV' osascript <<EOF || echo "Finder layout skipped: the window opens with Finder's own arrangement"
 tell application "Finder"
