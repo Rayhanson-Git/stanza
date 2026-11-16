@@ -7,7 +7,7 @@
 <p align="center"><b>The song you are playing, sung word by word across your Mac's desktop and lock screen.</b></p>
 
 <p align="center">
-  <a href="https://github.com/Rayhanson-Git/stanza/releases/latest"><img src="https://img.shields.io/badge/version-0.4.3-C2302F" alt="Version 0.4.2"></a>
+  <a href="https://github.com/Rayhanson-Git/stanza/releases/latest"><img src="https://img.shields.io/badge/version-0.4.4-C2302F" alt="Version 0.4.2"></a>
   <img src="https://img.shields.io/badge/licence-MIT-C2302F" alt="MIT licence">
   <img src="https://img.shields.io/badge/macOS-15%2B-0F3D3E" alt="macOS 15 or later">
   <img src="https://img.shields.io/badge/Apple%20silicon-arm64-0F3D3E" alt="Apple silicon (arm64)">

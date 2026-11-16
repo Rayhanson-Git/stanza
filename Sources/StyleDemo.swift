@@ -154,16 +154,21 @@ private struct FollowingDemoView: View {
     }
 }
 
-/// A demo on a virtual screen `screenHeight` points tall, scaled to fit `size`.
+/// A demo on a virtual screen `screenHeight` points tall, scaled to fit `size`, then magnified by `zoom`
+/// about the lyric band's centre.
 struct StyleStage: View {
     static let heroScreenHeight: CGFloat = 640
     static let tileScreenHeight: CGFloat = 560
+    /// Styles size themselves as shares of the screen, so `screenHeight` cannot enlarge them; this does.
+    static let heroZoom: CGFloat = 1.15
+    static let tileZoom: CGFloat = 1.1
 
     let demo: StyleDemo
     let size: CGSize
     let screenHeight: CGFloat
     let settings: AppSettings
     var live: LivePreviewSource?
+    var zoom: CGFloat = 1
 
     var body: some View {
         if size.width > 1, size.height > 1 {
@@ -172,6 +177,7 @@ struct StyleStage: View {
                 .frame(width: size.width / scale, height: screenHeight)
                 .scaleEffect(scale)
                 .frame(width: size.width, height: size.height)
+                .scaleEffect(zoom, anchor: UnitPoint(x: Layout.defaultCentre.x, y: Layout.defaultCentre.y))
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
         }
@@ -192,7 +198,8 @@ struct TileScene: View {
         let fillsTile = demo.style == .map && settings.mapFillsDisplay
         ZStack {
             StyleBackdrop(style: demo.style)
-            StyleStage(demo: demo, size: size, screenHeight: StyleStage.tileScreenHeight, settings: settings, live: live)
+            StyleStage(demo: demo, size: size, screenHeight: StyleStage.tileScreenHeight, settings: settings, live: live,
+                       zoom: fillsTile ? 1 : StyleStage.tileZoom)
                 .offset(y: fillsTile ? 0 : -Self.lift * size.height)
         }
         .frame(width: size.width, height: size.height)

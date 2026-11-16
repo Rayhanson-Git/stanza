@@ -69,7 +69,8 @@ struct GalleryHeroStage: View {
                                    .init(color: .clear, location: 0.42), .init(color: .black.opacity(0.45), location: 0.7),
                                    .init(color: .black.opacity(0.7), location: 1)],
                            startPoint: .top, endPoint: .bottom)
-            StyleStage(demo: model.heroDemo, size: stage, screenHeight: StyleStage.heroScreenHeight, settings: settings, live: model.live)
+            StyleStage(demo: model.heroDemo, size: stage, screenHeight: StyleStage.heroScreenHeight, settings: settings, live: model.live,
+                       zoom: geometry.framed ? 1 : StyleStage.heroZoom)
                 .modifier(ScreenEdge(on: geometry.framed))
                 .frame(width: width, alignment: .top)
                 .offset(y: geometry.offsetY)

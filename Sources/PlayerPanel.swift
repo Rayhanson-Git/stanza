@@ -51,7 +51,14 @@ struct PlayerDock: View {
         static let pillPadding: CGFloat = 4
         static let pillRadius = button / 2 + pillPadding
         static let cardRadius: CGFloat = 26
+        static let rowSpacing: CGFloat = 4
+        static let rowWidth = button * 2 + rowSpacing
     }
+
+    /// The one curve for every part of the move: shell, corners, icons, labels and panel.
+    private static let motion = Animation.spring(response: 0.5, dampingFraction: 0.82)
+    /// The panel arrives a beat after the shell starts growing, so the icons' move reads first.
+    private static let contentDelay = 0.1
 
     private static let order: [Player] = [.music, .spotify]
 
@@ -67,9 +74,9 @@ struct PlayerDock: View {
         let labelled = open == nil && hover.playerDock
         let calm = model.settings.reduceMotion
         // One glass shell that changes size and corners, so the pill grows into the card instead of swapping for it.
-        // Circular corners while it is a pill: continuous ones cannot reach a true capsule and leave flat ends.
-        let shell = open == nil ? RoundedRectangle(cornerRadius: Metrics.pillRadius, style: .circular)
-                                : RoundedRectangle(cornerRadius: Metrics.cardRadius, style: .continuous)
+        // Circular corners in both states: continuous ones cannot reach a true capsule, and switching style
+        // mid-move would jump the pill's ends; only the radius interpolates.
+        let shell = RoundedRectangle(cornerRadius: open == nil ? Metrics.pillRadius : Metrics.cardRadius, style: .circular)
         VStack(alignment: .leading, spacing: 14) {
             icons(open: open, labelled: labelled)
             if let open {
@@ -78,7 +85,9 @@ struct PlayerDock: View {
                     ScrollView(.vertical) { panel(open) }.scrollIndicators(.never)
                 }
                 .id(open)
-                .transition(.opacity)
+                .transition(calm ? .opacity : .asymmetric(
+                    insertion: .opacity.combined(with: .offset(y: 8)).animation(Self.motion.delay(Self.contentDelay)),
+                    removal: .opacity))
             }
         }
         .padding(open == nil ? Metrics.pillPadding : GalleryPanel.padding)
@@ -88,22 +97,28 @@ struct PlayerDock: View {
         .modifier(GlassSurface(shape: shell))
         .shadow(color: .black.opacity(open == nil ? 0 : 0.4), radius: 24, y: 10)
         .onHover { hover.setPlayerDock($0) }
-        .animation(calm ? nil : .spring(response: 0.32, dampingFraction: 0.86), value: labelled)
+        .animation(calm ? nil : Self.motion, value: labelled)
+        .animation(calm ? nil : Self.motion, value: open)
         .frame(maxHeight: maxHeight, alignment: .top)
         // Reduce Motion: the pill and the card cross-fade instead of one growing into the other.
         .id(calm && open != nil)
         .transition(.opacity)
     }
 
-    /// A column in the pill, a row at the top of the card; the same buttons move between the two.
+    /// A column in the pill, a row at the top of the card. Always the same column of the same buttons: in the
+    /// card its frame shrinks to one row and each later icon is offset up beside the first, so the move is an
+    /// interpolated offset and frame under `motion`, never a change of layout.
     private func icons(open: Player?, labelled: Bool) -> some View {
-        let layout = open == nil ? AnyLayout(VStackLayout(alignment: .leading, spacing: 0)) : AnyLayout(HStackLayout(spacing: 4))
-        return layout {
+        let row = open != nil
+        return VStack(alignment: .leading, spacing: 0) {
             ForEach(Self.order, id: \.self) { player in
-                button(player, isOpen: open == player, labelled: labelled, fillsColumn: open == nil)
+                let index = CGFloat(Self.order.firstIndex(of: player) ?? 0)
+                button(player, isOpen: open == player, labelled: labelled, fillsColumn: !row)
+                    .offset(x: row ? index * (Metrics.button + Metrics.rowSpacing) : 0, y: row ? -index * Metrics.button : 0)
             }
         }
         .fixedSize()
+        .frame(width: row ? Metrics.rowWidth : nil, height: row ? Metrics.button : nil, alignment: .topLeading)
     }
 
     private func button(_ player: Player, isOpen: Bool, labelled: Bool, fillsColumn: Bool) -> some View {

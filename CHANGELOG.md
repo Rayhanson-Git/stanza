@@ -2,6 +2,11 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.4
+
+- The player pill now moves fluidly: the icons glide along one spring into place beside each other as the pill grows into its panel, instead of snapping, and the panel fades in just after.
+- The style previews in the window are bigger: about 15% in the large preview and 10% on the tiles.
+
 ## 0.4.3
 
 - The Size, Font, Lock Screen and Aesthetics buttons now sit in a slim pill floating at the bottom of the window, and each panel rolls up out of the button that opened it.
