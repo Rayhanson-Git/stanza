@@ -101,7 +101,7 @@ struct CodeStyle: View {
     // MARK: Sizing and motion
 
     private func fittedSize(for row: CodeRow) -> CGFloat {
-        let base = context.band * Metrics.baseSize * context.settings.textScale
+        let base = context.band * Metrics.baseSize * context.scale
         let width = (row.plainText as NSString).size(withAttributes: [.font: Metrics.measuringFont]).width
         return width > 0 ? min(base, context.canvas.width * Metrics.maxRowWidth * Metrics.measuringSize / width) : base
     }

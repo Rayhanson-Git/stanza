@@ -188,7 +188,7 @@ private struct NotifyStage {
     let kicks: NotifyKicks
 
     init(context: StyleContext, plan: NotifyPlan, current: Int) {
-        let byHeight = context.band * NotifySizing.bandShare * context.settings.textScale / NotifySizing.referenceLine * NotifySizing.boost
+        let byHeight = context.band * NotifySizing.bandShare * context.scale / NotifySizing.referenceLine * NotifySizing.boost
         let unit = min(byHeight, context.canvas.width * NotifySizing.widthShare / NotifyMetrics.columnWidth)
         let height = context.band / unit
         let base = max(NotifySizing.baseMin * height, min(NotifySizing.baseMax * height, height - NotifySizing.baseRoomBelow))

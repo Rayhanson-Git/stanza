@@ -177,7 +177,7 @@ struct WordStackStyle: View {
 
     // MARK: Sizing
 
-    private var fisheyeBase: CGFloat { context.canvas.height * Metrics.fisheyeCapHeight * context.settings.textScale }
+    private var fisheyeBase: CGFloat { context.canvas.height * Metrics.fisheyeCapHeight * context.scale }
 
     /// Point size per word. Longer-held words are drawn bigger; nothing may exceed its width or the band.
     private func fontSizes(for words: [TimedWord]) -> [CGFloat] {
@@ -194,7 +194,7 @@ struct WordStackStyle: View {
             let slots = min(words.count, 3)
             return words.indices.map { index in
                 fitted(words[index].text, capHeight: fisheyeBase * Metrics.fisheyeHeights[slots][index],
-                       maxWidth: context.canvas.width * Metrics.fisheyeMaxWidth * settings.textScale * Metrics.fisheyeWidths[slots][index])
+                       maxWidth: context.canvas.width * Metrics.fisheyeMaxWidth * context.scale * Metrics.fisheyeWidths[slots][index])
             }
         }
         // Emphasis is relative to the whole line, so a word keeps its size while it scrolls up the stack.
@@ -202,7 +202,7 @@ struct WordStackStyle: View {
         let mean = durations.reduce(0, +) / Double(durations.count)
         let sizes = words.map { word -> CGFloat in
             let emphasis = min(max(sqrt(max(0.01, word.end - word.start) / mean), Metrics.emphasisRange.lowerBound), Metrics.emphasisRange.upperBound)
-            return fitted(word.text, capHeight: context.canvas.height * Metrics.capHeight * emphasis * settings.textScale,
+            return fitted(word.text, capHeight: context.canvas.height * Metrics.capHeight * emphasis * context.scale,
                           maxWidth: context.canvas.width * Metrics.maxWordWidth)
         }
         let stackHeight = sizes.reduce(0) { $0 + $1 * capRatio }

@@ -7,7 +7,7 @@ struct BranchesStyle: View {
     let context: StyleContext
 
     var body: some View {
-        let scale = context.settings.textScale
+        let scale = context.scale
         // Laid out narrower and then scaled up, so a large text size cannot push the stem's ends off screen.
         let size = CGSize(width: context.canvas.width / max(1, scale), height: context.band)
         let scene = BranchScene(context: context, size: size)

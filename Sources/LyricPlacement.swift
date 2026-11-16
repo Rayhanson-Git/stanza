@@ -23,8 +23,9 @@ final class LyricPlacement: NSObject, NSWindowDelegate {
         panel.isOpaque = false
         panel.backgroundColor = .clear
         panel.hasShadow = true
-        // Above ordinary windows, below menus and system alerts; never on the lock screen.
-        panel.level = .floating
+        // One above the lyrics, so even large lyrics never cover it. That is also above menus, which is fine for a
+        // small card that goes away on Done. Never on the lock screen.
+        panel.level = NSWindow.Level(rawValue: OverlayController.level.rawValue + 1)
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.hidesOnDeactivate = false
         panel.isReleasedWhenClosed = false

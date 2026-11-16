@@ -161,12 +161,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(item("Keep Screen Awake", #selector(toggleKeepAwake)))
         menu.addItem(item("Show When Unlocked", #selector(toggleShowWhenUnlocked)))
-        menu.addItem(item("Drag Position", #selector(toggleMoveLyrics)))
-        menu.addItem(item("Reset Position", #selector(resetLyricsPosition)))
         menu.addItem(.separator())
 
-        // It scales the whole style, not only the words, so it is "Size", as in the window.
-        menu.addItem(header("Size"))
+        // Where the lyrics sit and how big the whole style is, together in one place.
+        menu.addItem(header("Position and Size"))
+        menu.addItem(item("Drag Position", #selector(toggleMoveLyrics)))
+        menu.addItem(item("Reset Position", #selector(resetLyricsPosition)))
         let textScale = sliderItem(settings.textScale, AppSettings.textScaleRange, #selector(resetTextScale))
         textScaleSlider = textScale.slider
         menu.addItem(textScale.item)
@@ -263,14 +263,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     private func sliderItem(_ value: Double, _ range: ClosedRange<Double>, _ reset: Selector) -> (item: NSMenuItem, slider: SizeSlider) {
-        let slider = SizeSlider(frame: NSRect(x: 14, y: 4, width: 158, height: 22), value: value, range: range) { [weak self] scale in
+        let slider = SizeSlider(frame: NSRect(x: 14, y: 4, width: 140, height: 22), value: value, range: range) { [weak self] scale in
             self?.settings.textScale = scale
         }
-        let resetButton = NSButton(title: "Reset", target: self, action: reset)
+        let resetButton = NSButton(title: "Reset Size", target: self, action: reset)
         resetButton.bezelStyle = .rounded
         resetButton.controlSize = .small
         resetButton.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
-        resetButton.frame = NSRect(x: 178, y: 3, width: 58, height: 24)
+        resetButton.frame = NSRect(x: 160, y: 3, width: 80, height: 24)
         let container = NSView(frame: NSRect(x: 0, y: 0, width: 250, height: 30))
         container.addSubview(slider)
         container.addSubview(resetButton)

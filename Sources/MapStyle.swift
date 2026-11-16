@@ -233,8 +233,10 @@ struct MapLayout {
     let fillsDisplay: Bool
     let look: MapLook
 
-    init(canvas: CGSize, band: Double, fillsDisplay: Bool, tilted: Bool) {
-        let unit = min(Metrics.widthFit * canvas.width / Metrics.designWidth, Metrics.bandFit * band / Metrics.designBand)
+    /// `scale` (Size times the footprint) sizes the windowed map; the map filling the display ignores it.
+    init(canvas: CGSize, band: Double, fillsDisplay: Bool, tilted: Bool, scale: Double = 1) {
+        let fit = min(Metrics.widthFit * canvas.width / Metrics.designWidth, Metrics.bandFit * band / Metrics.designBand)
+        let unit = fillsDisplay ? fit : fit * scale
         self.unit = unit
         size = fillsDisplay ? canvas : CGSize(width: Metrics.designWidth * unit, height: Metrics.designHeight * unit)
         margin = (fillsDisplay ? Metrics.displayMargin : Metrics.windowMargin) * unit
@@ -304,7 +306,8 @@ struct MapScene {
     @MainActor
     init(context: StyleContext, plan: MapPlan, tour: MapTour) {
         let settings = context.settings, time = context.position
-        let layout = MapLayout(canvas: context.canvas, band: context.band, fillsDisplay: settings.mapFillsDisplay, tilted: settings.mapIn3D)
+        let layout = MapLayout(canvas: context.canvas, band: context.band, fillsDisplay: settings.mapFillsDisplay, tilted: settings.mapIn3D,
+                               scale: context.scale)
         let track = MapTrack(plan: plan, roads: tour.roads)
         let camera = track.camera(at: time)
         let soon = Metrics.lookAhead.compactMap { track.camera(at: time + $0) }
@@ -315,7 +318,8 @@ struct MapScene {
 
         position = time
         clock = context.clock
-        textScale = settings.textScale
+        // The windowed map is already scaled as a whole; the full-display map scales only its text, as before.
+        textScale = settings.mapFillsDisplay ? settings.textScale : 1
         reduceMotion = settings.reduceMotion
         self.plan = plan
         self.layout = layout

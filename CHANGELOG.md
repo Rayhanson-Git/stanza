@@ -2,6 +2,12 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.3.7
+
+- Every style is now the same size at the same Size setting. Each one was measured and balanced to fill about the same part of the screen, and Size now scales every style the same way. The Map in particular is much smaller and now shrinks and grows with Size (when it fills the whole display it stays full-screen). Because of this, a Size you set before may look different now.
+- The Drag Position card always stays above the lyrics, however large they are.
+- The menu bar menu has a **Position and Size** section with Drag Position, Reset Position and the Size slider, whose button now says **Reset Size**.
+
 ## 0.3.6
 
 - **Move Lyrics** is now called **Drag Position**, and **Reset Lyrics Position** is **Reset Position**. The Drag Position card has a size slider, so you can size and place the lyrics in one go.

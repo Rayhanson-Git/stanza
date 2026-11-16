@@ -11,7 +11,7 @@ struct MessagesStyle: View {
 
     var body: some View {
         let width = context.canvas.width
-        let unit = min(context.band * Metrics.unitPerBand * context.settings.textScale, width * Metrics.sheetShare / Metrics.sheetWidth)
+        let unit = min(context.band * Metrics.unitPerBand * context.scale, width * Metrics.sheetShare / Metrics.sheetWidth)
         // A window that has no size yet has no scale to draw at.
         let thread = unit > 0 ? MessageThread(plan: MessagesPlan.cached(for: context.lyrics), position: context.position,
                                               clock: context.clock, height: context.band / unit,

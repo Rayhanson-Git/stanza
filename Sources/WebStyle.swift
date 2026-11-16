@@ -9,7 +9,7 @@ struct WebStyle: View {
 
     var body: some View {
         if let scene = WebScene(context: context) {
-            let scale = context.settings.textScale
+            let scale = context.scale
             // The scene is scaled inside the canvas so text stays sharp; a canvas clips, so it gets room to grow.
             let height = context.band * (max(1, scale) + 2 * WebMetrics.canvasMargin)
             Canvas { graphics, size in
@@ -368,7 +368,7 @@ private struct WebScene {
         let pageStart = index / WebMetrics.pageSize * WebMetrics.pageSize
         let page = all[pageStart..<min(pageStart + WebMetrics.pageSize, all.count)]
         // Laid out narrower when text is enlarged, so the scaled-up web still fits the screen width.
-        let sceneSize = CGSize(width: context.canvas.width / max(1, settings.textScale), height: context.band)
+        let sceneSize = CGSize(width: context.canvas.width / max(1, context.scale), height: context.band)
         let geometry = WebGeometry(seed: all[pageStart].start, size: sceneSize)
         // Judged against the whole page rather than the words sung so far, so a word never changes size later.
         let meanDuration = page.reduce(0) { $0 + max($1.end - $1.start, WebMetrics.minMeanDuration) } / Double(page.count)

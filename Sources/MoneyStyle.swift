@@ -237,7 +237,7 @@ private struct MoneyScene {
     @MainActor
     init?(context: StyleContext, pictures: MoneyMapPictures) {
         guard !context.lyrics.words.isEmpty,
-              let geometry = MoneyGeometry(canvas: context.canvas, band: context.band, textScale: context.settings.textScale) else { return nil }
+              let geometry = MoneyGeometry(canvas: context.canvas, band: context.band, textScale: context.scale) else { return nil }
         let song = MoneyPlan.cached(for: context.lyrics), plan = song.plan
         pictures.prepare(mapStarts: plan.mapStarts, position: context.position)
         let energy: Double = context.settings.reduceMotion ? 0 : 1

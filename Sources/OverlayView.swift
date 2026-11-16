@@ -27,6 +27,32 @@ enum LyricStyle: String, CaseIterable {
     /// These styles tint their cards with colours from the album cover.
     var usesArtworkPalette: Bool { self == .money || self == .notifications }
 
+    /// Evens out how much of the screen each style takes at the same Size: a style that is large by nature is scaled
+    /// down, a small one up, so all of them fill about the same box (measured with `--render`, see the README).
+    var footprint: Double {
+        // Each fits a box half the screen wide and 45% tall at 100%. Branches and Constellation are drawn as a line
+        // across the whole screen by design, so only their height is matched.
+        switch self {
+        case .ship: return 0.75
+        case .fisheye, .fisheyeVisual: return 0.98
+        case .visual: return 0.99
+        case .codestyle, .codestyleVisual: return 0.96
+        case .branches: return 0.92
+        case .web: return 0.87
+        case .constellation: return 0.89
+        case .messages: return 1.15
+        case .money: return 0.81
+        case .notifications: return 1.08
+        case .map: return 0.69
+        }
+    }
+
+    /// The one scale a style draws at: the Size setting times its `footprint`. The Map filling the whole display keeps
+    /// its full size and only scales its text.
+    func scale(with settings: AppSettings) -> Double {
+        self == .map && settings.mapFillsDisplay ? 1 : settings.textScale * footprint
+    }
+
     /// How strongly the whole lyric block slowly sways in 3D (0 = perfectly still).
     var sway: Double {
         switch self {
@@ -70,6 +96,8 @@ struct StyleContext {
     let canvas: CGSize
     let band: CGFloat
     let settings: AppSettings
+    /// Size times the style's footprint (`LyricStyle.scale(with:)`); styles scale by this, never by Size directly.
+    var scale: Double = 1
     /// What is playing, for styles that show it (empty in previews without a real track).
     var trackTitle = ""
     var trackArtist = ""
@@ -147,8 +175,8 @@ struct LyricStage: View {
             // Nothing is drawn without lyrics, before the first word, or in a long instrumental gap.
             if let lyrics, let line = lyrics.line(at: position, alwaysDrawn: style.drawsWholeSong) {
                 styleView(style, StyleContext(line: line, lyrics: lyrics, position: position, clock: clock, canvas: size,
-                                              band: band, settings: settings, trackTitle: trackTitle,
-                                              trackArtist: trackArtist, artworkPalette: artworkPalette))
+                                              band: band, settings: settings, scale: style.scale(with: settings),
+                                              trackTitle: trackTitle, trackArtist: trackArtist, artworkPalette: artworkPalette))
             }
         }
         .frame(width: size.width, height: band)

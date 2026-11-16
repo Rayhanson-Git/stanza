@@ -11,7 +11,7 @@ struct ConstellationStyle: View {
         let sky = Sky(context: context)
         Canvas { graphics, _ in sky?.draw(in: graphics) }
             .frame(width: context.canvas.width, height: context.band)
-            .scaleEffect(context.settings.textScale)
+            .scaleEffect(context.scale)
             .offset(sky?.kick ?? .zero)
             .shadow(color: .black.opacity(Metrics.shadowOpacity), radius: Metrics.shadowRadius, y: Metrics.shadowY)
     }
@@ -261,7 +261,7 @@ private struct Sky {
     init?(context: StyleContext) {
         guard let chunk = Chunk(context: context) else { return nil }
         let map = ConstellationMap(seed: chunk.seed, width: context.canvas.width, band: context.band,
-                                   textScale: context.settings.textScale)
+                                   textScale: context.scale)
         let pulse = chunk.pulse(at: context.position)
         self.context = context
         self.chunk = chunk
@@ -354,7 +354,7 @@ private struct Sky {
         // (a magnified scene is wider than the screen, so its visible part is narrower than the canvas).
         let side: CGFloat = star.y > context.band / 2 ? -1 : 1
         let width = context.canvas.width
-        let nearest = (width - width / max(1, context.settings.textScale) + label.measure(in: context.canvas).width) / 2
+        let nearest = (width - width / max(1, context.scale) + label.measure(in: context.canvas).width) / 2
         let pop = 1 + Metrics.labelPop * exp(-motion.age / Metrics.labelPopDecay)
         var layer = graphics
         layer.opacity = min(1, min(motion.age / Metrics.labelFadeIn, 1) * motion.brightness)

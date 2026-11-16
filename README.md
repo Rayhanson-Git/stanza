@@ -55,7 +55,7 @@ What you get:
 
 ## Status and limits
 
-Version 0.3.6. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+Version 0.3.7. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
 source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
@@ -196,8 +196,7 @@ The menu-bar icon is the logo mark. Its menu has:
 - **Styles**: every style, grouped as Kinetic type, Motion scenes and Phone screens, with any pinned styles first.
   The style in use is ticked.
 - **Keep Screen Awake** and **Show When Unlocked**
-- **Drag Position**: shows a card to drag the lyrics anywhere on screen, with a size slider on it; **Reset Position** puts them back in the middle
-- **Size**: a slider for the size of the whole style, with a Reset button
+- **Position and Size**: **Drag Position** shows a card to drag the lyrics anywhere on screen, with a size slider on it; **Reset Position** puts them back in the middle; the **Size** slider scales the whole style, with **Reset Size**
 - **Displays**: one item per connected display, to turn the lyrics on or off there
 - **Check for Updates…**, which reads **Restart to Update** while a downloaded update waits
 - **Quit Stanza**
@@ -276,7 +275,7 @@ $APP --render-tile "Web" web-tile.png                      # one shelf tile
   the tilted words of Ship, Visual and the Fisheye styles land in the wrong place. Use another style for that render.
 
 The images in `assets/` were made this way. The style frames are `--render` output cropped to the lyric band
-(`sips -c 600 1440`), and the banner and social preview are drawn from them by `design/banner/banner.swift`:
+(`sips -c 600 1440 --cropOffset 204 0`, since the lyrics band is centred 56% of the way down), and the banner and social preview are drawn from them by `design/banner/banner.swift`:
 
 ```bash
 swiftc -O -swift-version 5 -target arm64-apple-macosx15.0 design/banner/banner.swift -o /tmp/stanza-banner

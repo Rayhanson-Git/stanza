@@ -43,6 +43,9 @@ final class LockScreenSpace {
 
 /// One transparent, click-through, full-screen lyrics window per enabled display.
 final class OverlayController {
+    /// Just under the very top, so lyrics show over other apps and, through `LockScreenSpace`, the lock screen.
+    static let level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.maximumWindow)) - 2)
+
     private let settings: AppSettings
     private let makeContent: (UInt32) -> AnyView
     private let lockScreenSpace = LockScreenSpace()
@@ -100,7 +103,7 @@ final class OverlayController {
         window.ignoresMouseEvents = true
         window.isReleasedWhenClosed = false
         window.canBecomeVisibleWithoutLogin = true
-        window.level = NSWindow.Level(rawValue: Int(CGWindowLevelForKey(.maximumWindow)) - 2)
+        window.level = Self.level
         window.collectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle, .fullScreenAuxiliary]
         window.contentView = NSHostingView(rootView: makeContent(id))
         window.setFrame(screen.frame, display: true)
