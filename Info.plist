@@ -10,17 +10,27 @@
 	<string>tech.rayhanson.stanza</string>
 	<key>CFBundleName</key>
 	<string>Stanza</string>
-	<key>CFBundleVersion</key>
-	<string>2</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.2</string>
+	<string>0.3.0</string>
+	<key>CFBundleVersion</key>
+	<string>3</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>15.0</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Stanza reads the current track and playback position from Spotify and Music to show lyrics in time with the song.</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2026 Harvey Rayhanson. MIT licence.</string>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/Rayhanson-Git/stanza/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>x/5kMnoAkhYVs9nXY/16XU4TcYOHfUkN9RYVAztLvBk=</string>
 </dict>
 </plist>

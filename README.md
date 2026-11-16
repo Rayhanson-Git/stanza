@@ -19,7 +19,8 @@
   <a href="#about">About</a> |
   <a href="#status-and-limits">Status and limits</a> |
   <a href="#features">Features</a> |
-  <a href="#quick-start">Quick start</a> |
+  <a href="#install">Install</a> |
+  <a href="#build-from-source">Build from source</a> |
   <a href="#usage">Usage</a> |
   <a href="#how-it-works">How it works</a> |
   <a href="#privacy-and-network">Privacy and network</a> |
@@ -54,12 +55,15 @@ What you get:
 
 ## Status and limits
 
-Version 0.2. Stanza is built from source; there is no prebuilt download.
+Version 0.3. Download it from [Releases](https://github.com/Rayhanson-Git/stanza/releases/latest), or build it from
+source. It keeps itself up to date.
 
 - **Built with Apple's Command Line Tools.** `build.sh` calls `swiftc` directly. Xcode is not needed.
 - **Apple silicon and macOS 15 or later.** The build targets `arm64-apple-macosx15.0` only.
-- **Ad-hoc signed.** The app is signed locally with no developer identity, so macOS asks for Automation permission
-  before Stanza can read Spotify or Apple Music, and may ask again after each rebuild because the signature changes.
+- **Not notarised.** Stanza is signed without an Apple developer identity. The first time you open a downloaded copy,
+  macOS blocks it until you allow it in System Settings (see [Install](#install)). For the same reason macOS asks for
+  Automation permission before Stanza can read Spotify or Apple Music, and may ask again after an update or rebuild,
+  because the signature changes.
 - **The lock screen relies on a private API.** Drawing above the lock screen uses an undocumented window-server
   interface. Every call is looked up at runtime and the app keeps working without it (lyrics then show only while the
   Mac is unlocked), but a macOS update could break it at any time.
@@ -139,7 +143,21 @@ Other details:
 - The overlay steps aside on the display where the Stanza window is open, so lyrics never play over their own previews.
 - A short first-run introduction in the window covers the player, the permission and the choice of style.
 
-## Quick start
+## Install
+
+1. Open the [latest release](https://github.com/Rayhanson-Git/stanza/releases/latest) and download
+   **Stanza-&lt;version&gt;.dmg**.
+2. Open the disk image and drag **Stanza** into **Applications**. Open it from Applications, not from the disk image.
+3. The first time, macOS says it cannot check Stanza for malicious software, because Stanza is not notarised by Apple.
+   Click **Done**, then open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** next to
+   Stanza.
+
+Stanza then updates itself. Once a day it looks for a new version, downloads it quietly and installs it the next time
+Stanza restarts. While an update waits, the menu-bar menu and the window offer **Restart to Update**. Choose **Check
+for Updates…** at any time, or switch off automatic installs at the bottom of the window. Updates are only installed
+when they carry this project's signature. What changed in each version is in [CHANGELOG.md](CHANGELOG.md).
+
+## Build from source
 
 You need:
 
@@ -165,7 +183,8 @@ to `/Applications` first if you prefer.
 The window opens when Stanza starts and whenever you choose **Open Stanza** from the menu-bar icon. While it is open,
 Stanza also has a Dock icon. Use the arrows or the dots to browse the styles in the large preview, **Select** to use
 one, and the pin button to keep it at the top of the menu-bar menu. The panels across the top hold the settings; the
-player icons at the top right open the Spotify and Apple Music panels.
+player icons at the top right open the Spotify and Apple Music panels. At the bottom of the window are the version,
+**Check for Updates…** and the switch for automatic updates.
 
 ### The menu bar
 
@@ -177,6 +196,7 @@ The menu-bar icon is the logo mark. Its menu has:
 - **Keep Screen Awake** and **Show When Unlocked**
 - **Text Size**: a slider with a Reset button
 - **Displays**: one item per connected display, to turn the lyrics on or off there
+- **Check for Updates…**, which reads **Restart to Update** while a downloaded update waits
 - **Quit Stanza**
 
 ### Permissions
@@ -215,6 +235,7 @@ Stanza has no accounts, no analytics and no telemetry. These are the only things
 |---|---|---|
 | Track title and artist | NetEase Cloud Music (`music.163.com`) and LRCLIB (`lrclib.net`), over HTTPS, without cookies | When a track has no cached lyrics. |
 | Map tiles and walking directions | Apple Maps, through MapKit | The Map style walks a route through a built-in demo city; the Money style shows map pictures of a few well-known landmarks. This also happens for their previews in the window. Your location is never read. |
+| An update check | GitHub (`github.com` and its download servers), over HTTPS | Once a day, and when you choose **Check for Updates…**. The request carries Stanza's version number, as any download does; no other system details are sent. |
 | A request for the album cover | The address Spotify reports for the current track's cover, over HTTPS only | Only when **Colours from the album cover** is on or the Money or Notifications style is in use. Apple Music hands the cover over directly, with no request. |
 
 On your Mac, Stanza keeps:
@@ -259,10 +280,26 @@ swiftc -O -swift-version 5 -target arm64-apple-macosx15.0 design/banner/banner.s
 /tmp/stanza-banner    # run from the repository root
 ```
 
+### Releases
+
+Updates use [Sparkle](https://sparkle-project.org). `build.sh` downloads the pinned Sparkle version into `Vendor/`
+(not committed) and checks it against a fixed checksum. To make a release, raise `CFBundleShortVersionString` and
+`CFBundleVersion` in `Info.plist`, add a section for the version to `CHANGELOG.md`, commit and push, then run:
+
+```bash
+scripts/release.sh             # build/release/Stanza-<version>.dmg and appcast.xml
+scripts/release.sh --publish   # the same, then the GitHub release
+```
+
+The disk image is signed with a private EdDSA key kept in the maintainer's login Keychain (made once with
+`Vendor/Sparkle-*/bin/generate_keys --account tech.rayhanson.stanza`); the matching public key is `SUPublicEDKey` in
+`Info.plist`. Installed copies read the feed attached to the latest release, so publishing a release is what makes
+them update.
+
 ## Project layout
 
 ```text
-Sources/            the app: 48 Swift files, about 12,200 lines
+Sources/            the app: 50 Swift files, about 12,400 lines
   main.swift          entry point and the command-line tools
   AppDelegate.swift   the menu-bar menu and app lifecycle
   NowPlayingMonitor.swift, PlayerLink.swift   reading the players, and the permission steps
@@ -271,12 +308,16 @@ Sources/            the app: 48 Swift files, about 12,200 lines
   OverlayView.swift, OverlayWindows.swift     the styles list, the shared stage and the lock-screen windows
   *Style.swift and their helpers              how each style draws (WordStackStyle.swift covers the kinetic type)
   Gallery*.swift, PlayerPanel.swift, OnboardingView.swift   the window
+  AppUpdater.swift, UpdateViews.swift        the updater, and its controls in the menu and window
   SelfCheck.swift, GallerySelfCheck.swift     the self-check
-Resources/          app icon, logo and menu-bar mark
-Info.plist          bundle ID tech.rayhanson.stanza, macOS 15 minimum
-build.sh            build, sign ad hoc, self-check
+Resources/          app icon, logo, menu-bar mark and the disk-image background
+Info.plist          bundle ID tech.rayhanson.stanza, macOS 15 minimum, the update feed and key
+build.sh            fetch Sparkle, build, sign ad hoc, self-check
+scripts/release.sh  disk image, update signature, feed and GitHub release
+CHANGELOG.md        what changed in each version
 design/logo/        the script that draws the logo and icon, and the exploration sheet of forms
 design/banner/      the script that draws the README banner and the social preview
+design/dmg/         the script that draws the disk-image background
 assets/             README images
 ```
 

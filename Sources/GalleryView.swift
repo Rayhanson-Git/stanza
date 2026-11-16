@@ -85,6 +85,11 @@ struct GalleryTopBar: View {
 
     var body: some View {
         ZStack {
+            if let updater = model.updater {
+                UpdatePill(updater: updater)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, GalleryPanel.margin)
+            }
             HStack(spacing: 2) {
                 ForEach(GalleryMenu.settings, id: \.self) { menu in
                     MenuButton(title: menu.title, isOpen: model.menu == menu, hover: model.hover) { model.toggle(menu) }

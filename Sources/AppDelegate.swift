@@ -15,6 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private let screenAwake = ScreenAwake()
     private let presence = OverlayPresence()
     private let playerLink = PlayerLink()
+    private let updater = AppUpdater()
     // Created in buildMenu, after the single-instance check, so a second launch never flashes an icon.
     private var statusItem: NSStatusItem?
     private lazy var engine = LyricEngine(monitor: monitor, settings: settings)
@@ -23,8 +24,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         AnyView(LyricOverlayView(engine: engine, monitor: monitor, settings: settings, artwork: colorSync,
                                  presence: presence, display: display))
     }
-    private lazy var gallery = GalleryWindowController { [settings, engine, monitor, playerLink] in
-        GalleryModel(settings: settings, engine: engine, monitor: monitor, playerLink: playerLink)
+    private lazy var gallery = GalleryWindowController { [settings, engine, monitor, playerLink, updater] in
+        GalleryModel(settings: settings, engine: engine, monitor: monitor, playerLink: playerLink, updater: updater)
     }
     private var lockMonitor: LockMonitor?
     private var observers: Set<AnyCancellable> = []
@@ -53,6 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         }
         buildMenu()
         buildMainMenu()
+        updater.start()
         lockMonitor = LockMonitor { [weak self] locked in
             self?.gallery.locked = locked
             self?.applyPresence()
@@ -146,6 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         displayHeader.tag = Tag.displayHeader
         menu.addItem(displayHeader)
         menu.addItem(.separator())
+        menu.addItem(item("Check for Updates…", #selector(runUpdater)))
         menu.addItem(NSMenuItem(title: "Quit Stanza", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
         statusItem.menu = menu
     }
@@ -153,6 +156,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     /// While its window is open Stanza is a regular app, and ⌘Q, ⌘H, ⌘W and ⌘M only work through a main menu.
     private func buildMainMenu() {
         let appMenu = NSMenu()
+        // Retitled in menuNeedsUpdate, like the status menu, so it says "Restart to Update" when that is what it does.
+        appMenu.delegate = self
+        appMenu.autoenablesItems = false
+        appMenu.addItem(item("Check for Updates…", #selector(runUpdater)))
+        appMenu.addItem(.separator())
         appMenu.addItem(NSMenuItem(title: "Hide Stanza", action: #selector(NSApplication.hide(_:)), keyEquivalent: "h"))
         appMenu.addItem(.separator())
         appMenu.addItem(NSMenuItem(title: "Quit Stanza", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
@@ -188,6 +196,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             switch menuItem.action {
             case #selector(toggleKeepAwake): menuItem.state = settings.keepScreenAwake ? .on : .off
             case #selector(toggleShowWhenUnlocked): menuItem.state = settings.showWhenUnlocked ? .on : .off
+            case #selector(runUpdater):
+                menuItem.title = updater.actionTitle
+                menuItem.isEnabled = updater.canAct
             default: break
             }
         }
@@ -245,6 +256,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     }
 
     @objc private func showGallery() { gallery.show() }
+    @objc private func runUpdater() { updater.act() }
     @objc private func toggleKeepAwake() { settings.keepScreenAwake.toggle() }
     @objc private func toggleShowWhenUnlocked() { settings.showWhenUnlocked.toggle() }
     @objc private func textScaleChanged(_ sender: NSSlider) { settings.textScale = sender.doubleValue }

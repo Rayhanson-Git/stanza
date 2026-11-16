@@ -80,6 +80,8 @@ final class GalleryModel: ObservableObject {
     let engine: LyricEngine
     let monitor: NowPlayingMonitor
     let playerLink: PlayerLink
+    /// Absent in the offscreen render tool, which must never go online.
+    let updater: AppUpdater?
     let stills: StyleStills
     let hover = GalleryHover()
 
@@ -98,9 +100,10 @@ final class GalleryModel: ObservableObject {
 
     /// `onboarding` overrides the saved first-run flag, and `watchPlayers: false` keeps the players from
     /// being polled (the render tool uses both; nothing is written).
-    init(settings: AppSettings, engine: LyricEngine, monitor: NowPlayingMonitor, playerLink: PlayerLink, onboarding: Bool? = nil,
-         watchPlayers: Bool = true) {
+    init(settings: AppSettings, engine: LyricEngine, monitor: NowPlayingMonitor, playerLink: PlayerLink, updater: AppUpdater? = nil,
+         onboarding: Bool? = nil, watchPlayers: Bool = true) {
         self.settings = settings
+        self.updater = updater
         self.engine = engine
         self.monitor = monitor
         self.playerLink = playerLink
