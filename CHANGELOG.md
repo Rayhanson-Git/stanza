@@ -2,6 +2,10 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.3.1
+
+- The menu bar icon is a little smaller and lighter, closer in weight to the system icons beside it.
+
 ## 0.3.0
 
 - Stanza now keeps itself up to date. It looks for a new version once a day, downloads it quietly and installs it the next time Stanza restarts.
