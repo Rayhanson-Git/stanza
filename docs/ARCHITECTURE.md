@@ -454,6 +454,10 @@ publish an ad hoc build.
 offered for a copy in an Applications folder, because a login item pointing at a copy on the disk image or in
 Downloads would break when that copy goes away. If macOS needs the user to approve it, the Settings panel says so.
 
+A login start is quiet. `LoginItem.launchedAtLogin` reads the open-app Apple event of the launch, which macOS marks
+as a login-item launch, and `AppDelegate` then skips opening the window: Stanza starts in the menu bar only, as an
+accessory app with no Dock icon, until the window is asked for. Opening Stanza any other way shows the window.
+
 ## Data and settings
 
 ```mermaid

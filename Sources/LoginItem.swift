@@ -8,6 +8,15 @@ final class LoginItem: ObservableObject {
     /// leave the login item pointing at a copy that later disappears.
     static let isInstalled = ["/Applications/", NSHomeDirectory() + "/Applications/"].contains { Bundle.main.bundlePath.hasPrefix($0) }
 
+    /// Whether `event`, the open-app event of this launch, says macOS opened Stanza as a login item. Pass it while
+    /// launching: later the current event is something else. macOS sends the flag as the event's property value;
+    /// the SDK header describes it as its own parameter, so either form counts.
+    static func launchedAtLogin(_ event: NSAppleEventDescriptor?) -> Bool {
+        guard let event, event.eventID == kAEOpenApplication else { return false }
+        return event.paramDescriptor(forKeyword: keyAEPropData)?.enumCodeValue == keyAELaunchedAsLogInItem
+            || event.paramDescriptor(forKeyword: keyAELaunchedAsLogInItem) != nil
+    }
+
     @Published private(set) var isOn = false
     /// macOS has the item but waits for the user to allow it in System Settings.
     @Published private(set) var needsApproval = false

@@ -128,6 +128,18 @@ func runSelfCheck() {
           "lyric offset: a wild move stops half a screen past the edge")
     check(Layout.clampedOffset(.zero) == .zero, "lyric offset: zero is the middle")
 
+    // Login launch: only the open-app event flagged as a login item keeps the window closed.
+    let openEvent = NSAppleEventDescriptor(eventClass: AEEventClass(kCoreEventClass), eventID: AEEventID(kAEOpenApplication),
+                                           targetDescriptor: nil, returnID: AEReturnID(kAutoGenerateReturnID),
+                                           transactionID: AETransactionID(kAnyTransactionID))
+    check(!LoginItem.launchedAtLogin(openEvent), "launch: an ordinary open still shows the window")
+    check(!LoginItem.launchedAtLogin(nil), "launch: no event means the window shows")
+    let asProperty = openEvent.copy() as! NSAppleEventDescriptor
+    asProperty.setParam(NSAppleEventDescriptor(enumCode: OSType(keyAELaunchedAsLogInItem)), forKeyword: keyAEPropData)
+    check(LoginItem.launchedAtLogin(asProperty), "launch: a login-item open (flag as the property) keeps the window closed")
+    openEvent.setParam(NSAppleEventDescriptor(boolean: true), forKeyword: AEKeyword(keyAELaunchedAsLogInItem))
+    check(LoginItem.launchedAtLogin(openEvent), "launch: a login-item open (flag as a parameter) keeps the window closed")
+
     guard failures == 0 else {
         print("self-check: \(failures) failure(s)")
         exit(1)

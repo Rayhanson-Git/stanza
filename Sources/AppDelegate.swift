@@ -93,7 +93,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         gallery.onPresenceChange = { [weak self] in self?.applyPresence() }
         gallery.locked = isLocked
-        gallery.show()
+        // Started at login, Stanza waits in the menu bar; the window opens when it is asked for.
+        if !LoginItem.launchedAtLogin(NSAppleEventManager.shared().currentAppleEvent) { gallery.show() }
     }
 
     /// Clicking the Dock icon brings the window back.

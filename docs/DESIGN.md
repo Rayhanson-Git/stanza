@@ -342,7 +342,9 @@ looks for them. Keeping them apart from the lyric settings at the bottom separat
 app behaves", so neither panel is cluttered by the other. Its panel opens from the gear's corner (scale 0.94 on the
 same spring as the other panels) and, like the player card, narrows the hero so the preview stays in view. Updates
 follow the same "quiet until needed" rule: only when one is waiting does a glass pill appear at the top left of the
-window ("Restart to update", `UpdatePill` in `UpdateViews.swift`) and the menu item turn into **Restart to Update**.
+window ("Restart to update", `UpdatePill` in `UpdateViews.swift`) and the menu item turn into **Restart to Update**. Open at
+login keeps the same rule: a login start brings only the menu bar icon, because a window jumping up while the Mac
+is still starting is noise, not help. Stanza is already working by then; the window is there when it is asked for.
 The one moment the app needs something from you is the one moment it shows.
 
 ### The menu bar
