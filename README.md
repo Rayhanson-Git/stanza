@@ -212,7 +212,7 @@ with Esc. Why the controls work this way is in [DESIGN.md](docs/DESIGN.md#intera
 | **Lock Screen** | Show lyrics when unlocked too, or on the lock screen only. Keep the screen from sleeping while a song plays. Turn each display on or off. |
 | **Aesthetics** | Three colours (lyric text, highlight, secondary text) from the system colour picker, or colours taken from the album cover of each song. |
 | **Spotify**, **Apple Music** | Connection status as numbered steps (player open, permission, playing, lyrics found), with a one-click fix for the step that is still open. Timing: a per-song nudge in 1-second steps (up to 20 seconds either way, forgotten at the next song) and a saved offset of up to 1 second for every song. |
-| **Settings** (the gear) | Open Stanza at login. Install updates automatically. The version, and **Check Now**. **About Stanza**: credits and links. |
+| **Settings** (the gear) | Open Stanza at login. Keyboard shortcuts to show or hide the lyrics and to move to the next style, none set until you record them. Install updates automatically. The version, and **Check Now**. **About Stanza**: credits and links. |
 
 With the Map style browsed, two extra buttons choose **3D** or **Flat**, and whether the map fills the **Whole
 display** or sits in a **Window**. A short first-run introduction covers the player, the permission and the choice of
@@ -235,6 +235,14 @@ The menu-bar icon is the logo mark. Its menu has:
 
 Star a style on the large preview or on its tile. Starred styles get their own row in the window, and once there are
 any, the menu-bar menu lists only those (plus the style in use), so it stays short however many styles there are.
+
+### Keyboard shortcuts
+
+Stanza has no shortcuts until you set them. In Settings, click **Set** next to **Show or hide the lyrics** or **Next
+style** and press the keys you want, holding two of ⌃ ⌥ ⌘ with them (⌃⌥L, say), so a shortcut never takes copy or paste away from other apps. They then work from any app. Show or hide flips the same
+switch as **Show When Unlocked**, so the lyrics on the lock screen are not affected. Next style steps through your
+Favourites, or through every style when you have none. Esc cancels a recording, Delete removes a shortcut, and the ✕
+next to one clears it. If another app already uses those keys, Settings says so.
 
 ### Drag Position and Size
 
@@ -272,7 +280,7 @@ No other permission is needed. Stanza does not ask for your location, microphone
 
 ## Status and limits
 
-Version 0.4.6.
+Version 0.4.7.
 
 - **Not notarised.** Releases are signed with the project's own certificate, not an Apple developer identity, so the
   first time you open a downloaded copy macOS blocks it until you allow it (see [Install](#install)).
@@ -410,9 +418,10 @@ Both are backed up outside this Mac. On a new Mac, import the certificate's `.p1
 ## Project layout
 
 ```text
-Sources/            the app: 65 Swift files, about 17,000 lines
+Sources/            the app: 67 Swift files, about 17,000 lines
   main.swift          entry point and the command-line tools
   AppDelegate.swift   the menu-bar menu and app lifecycle
+  GlobalShortcuts.swift, ShortcutViews.swift  keyboard shortcuts and their rows in Settings
   NowPlayingMonitor.swift, PlayerLink.swift   reading the players, and the permission steps
   LyricsProvider.swift, LyricsParsing.swift   finding, matching, parsing and caching lyrics
   LyricEngine.swift   the lyric clock and timing offsets

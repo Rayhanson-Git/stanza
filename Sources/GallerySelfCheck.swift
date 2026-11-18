@@ -1,4 +1,5 @@
 import AppKit
+import Carbon.HIToolbox
 
 /// Checks of the pure logic of the window and of the app shell around it, run as part of `--self-check`.
 /// Returns what failed.
@@ -149,6 +150,32 @@ private func shellChecks() -> [String] {
                  && !AppDelegate.yields((nil, 10), to: (nil, 20)), "copies launched at the same instant: exactly one exits, the higher process number")
     let fetchable = ["https://i.scdn.co/image/abc", "HTTPS://i.scdn.co/image/abc"].compactMap(URL.init(string:))
     let refused = ["http://i.scdn.co/image/abc", "file:///etc/hosts", "/etc/hosts", "data:text/plain,x"].compactMap(URL.init(string:))
+    // Shortcuts: pure checks only, nothing registered or saved.
+    let controlOptionL = KeyCombo.make(keyCode: UInt16(kVK_ANSI_L), flags: [.control, .option], characters: "l")
+    checks.check(controlOptionL == KeyCombo(keyCode: UInt32(kVK_ANSI_L), modifiers: UInt32(controlKey | optionKey), label: "⌃⌥L"),
+                 "shortcut: ⌃⌥L is recorded with its Carbon modifiers and reads in menu order")
+    checks.check([[.option, .shift], [], [.command], [.command, .shift], [.control]].allSatisfy {
+                     KeyCombo.make(keyCode: UInt16(kVK_ANSI_V), flags: $0, characters: "v") == nil },
+                 "shortcut: fewer than two of ⌃ ⌥ ⌘ is not recorded, so ⌘V and the like stay with every app")
+    checks.check(KeyCombo.make(keyCode: UInt16(kVK_RightArrow), flags: [.command, .option, .shift], characters: "\u{F703}")?.label == "⌥⇧⌘→",
+                 "shortcut: special keys get their own names")
+    let saved = controlOptionL.flatMap { try? JSONEncoder().encode($0) }
+    checks.check(controlOptionL != nil && GlobalShortcuts.decode(saved) == controlOptionL && GlobalShortcuts.decode(nil) == nil
+                 && GlobalShortcuts.decode(Data("junk".utf8)) == nil, "shortcut: saved and read back; nothing or junk means none")
+    if let combo = controlOptionL {
+        checks.check(GlobalShortcuts.conflict(combo, for: .nextStyle, in: [.toggleLyrics: combo]) == .toggleLyrics
+                     && GlobalShortcuts.conflict(combo, for: .toggleLyrics, in: [.toggleLyrics: combo]) == nil,
+                     "shortcut: the same keys cannot do two things, but can be set again for the same one")
+    }
+    let all = LyricStyle.allCases, menuOrder = AppSettings.menuGroups(favourites: [], current: all[0]).flatMap(\.styles)
+    checks.check(AppSettings.nextStyle(after: menuOrder[0], favourites: []) == menuOrder[1]
+                 && AppSettings.nextStyle(after: menuOrder[menuOrder.count - 1], favourites: []) == menuOrder[0],
+                 "next style: with no favourites, every style in menu order, round again at the end")
+    let favourites: Set<LyricStyle> = [all[2], all[5]]
+    checks.check(AppSettings.nextStyle(after: all[2], favourites: favourites) == all[5]
+                 && AppSettings.nextStyle(after: all[5], favourites: favourites) == all[2]
+                 && AppSettings.nextStyle(after: all[0], favourites: favourites) == all[2],
+                 "next style: through the favourites only; from another style, to the first favourite")
     checks.check(fetchable.count == 2 && fetchable.allSatisfy(ArtworkColorSync.isFetchable)
                  && refused.count == 4 && !refused.contains(where: ArtworkColorSync.isFetchable), "album art is fetched over https only")
     return checks.failures

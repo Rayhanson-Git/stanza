@@ -90,6 +90,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         _ = colorSync
         monitor.start()
+        GlobalShortcuts.shared.start { [weak self] action in self?.perform(action) }
 
         gallery.onPresenceChange = { [weak self] in self?.applyPresence() }
         gallery.locked = isLocked
@@ -304,6 +305,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func pickStyle(_ sender: NSMenuItem) {
         (sender.representedObject as? String).flatMap(LyricStyle.init(rawValue:)).map { settings.style = $0 }
+    }
+
+    /// A keyboard shortcut from Settings. Hiding flips the same switch as the menu, so both always agree.
+    private func perform(_ action: ShortcutAction) {
+        switch action {
+        case .toggleLyrics: settings.showWhenUnlocked.toggle()
+        case .nextStyle: settings.style = AppSettings.nextStyle(after: settings.style, favourites: settings.favouriteStyles)
+        }
     }
 
     @objc private func showGallery() { gallery.show() }

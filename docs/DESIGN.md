@@ -336,7 +336,7 @@ open. Numbered steps turn a confusing permissions problem into a short checklist
 
 ### The Settings gear
 
-Settings that belong to the app rather than to the lyrics (Open at login, Install updates automatically, the version
+Settings that belong to the app rather than to the lyrics (Open at login, keyboard shortcuts, Install updates automatically, the version
 with **Check Now**, and **About Stanza**) live behind a single gear at the top right, the place a Mac user already
 looks for them. Keeping them apart from the lyric settings at the bottom separates "how the words look" from "how the
 app behaves", so neither panel is cluttered by the other. Its panel opens from the gear's corner (scale 0.94 on the
@@ -344,7 +344,9 @@ same spring as the other panels) and, like the player card, narrows the hero so 
 follow the same "quiet until needed" rule: only when one is waiting does a glass pill appear at the top left of the
 window ("Restart to update", `UpdatePill` in `UpdateViews.swift`) and the menu item turn into **Restart to Update**. Open at
 login keeps the same rule: a login start brings only the menu bar icon, because a window jumping up while the Mac
-is still starting is noise, not help. Stanza is already working by then; the window is there when it is asked for.
+is still starting is noise, not help. Stanza is already working by then; the window is there when it is asked for. Keyboard shortcuts follow it too: none are set until you record one, because a
+shortcut nobody chose can clash with another app's or fire by surprise, and the lyrics' own switches stay the only
+state, so a shortcut never leaves the menu and the window disagreeing.
 The one moment the app needs something from you is the one moment it shows.
 
 ### The menu bar

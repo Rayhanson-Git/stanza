@@ -213,6 +213,15 @@ final class AppSettings: ObservableObject {
         return byCategory
     }
 
+    /// The style the Next style shortcut moves to: through the favourites when there are any, otherwise through every
+    /// style in the menu's order, starting over at the end. From a style outside the list it goes to the first.
+    static func nextStyle(after current: LyricStyle, favourites: Set<LyricStyle>) -> LyricStyle {
+        let order = favourites.isEmpty ? menuGroups(favourites: [], current: current).flatMap(\.styles)
+                                       : LyricStyle.allCases.filter(favourites.contains)
+        guard let index = order.firstIndex(of: current) else { return order.first ?? current }
+        return order[(index + 1) % order.count]
+    }
+
     func toggleFavourite(_ style: LyricStyle) {
         favouriteStyles = Self.togglingPin(style, in: favouriteStyles)
         log("favourite \(style.rawValue) → \(favouriteStyles.contains(style) ? "on" : "off")")

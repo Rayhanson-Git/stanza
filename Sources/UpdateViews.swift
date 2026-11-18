@@ -46,6 +46,8 @@ struct SettingsPanel: View {
                 PanelNote(text: "Allow Stanza in System Settings › General › Login Items to finish.")
             }
             if let problem = loginItem.problem { PanelNote(text: problem) }
+            PanelRule()
+            ShortcutSettings(shortcuts: GlobalShortcuts.shared)
             if let updater {
                 PanelRule()
                 UpdateSettings(updater: updater)

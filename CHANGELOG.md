@@ -2,6 +2,10 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.7
+
+- Keyboard shortcuts, off until you set them. In Settings (the gear), record one to show or hide the lyrics and one to move to the next style, from any app. A shortcut uses two of ⌃ ⌥ ⌘ (⌃⌥L, say), so it never takes copy, paste and the like away from other apps. Show or hide uses the same switch as Show When Unlocked, so the lock screen keeps its lyrics; Next style goes through your Favourites, or every style when you have none.
+
 ## 0.4.6
 
 - The lyrics now fade away 5 seconds after you pause the music, instead of 10. They still come back the moment it plays again.

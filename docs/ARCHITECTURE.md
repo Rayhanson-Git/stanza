@@ -39,6 +39,7 @@ describes the current code. Why the app looks and moves the way it does is in [D
 - [Colours from the album cover](#colours-from-the-album-cover)
 - [Updates and releases](#updates-and-releases)
 - [Open at login](#open-at-login)
+- [Keyboard shortcuts](#keyboard-shortcuts)
 - [Data and settings](#data-and-settings)
 - [Building and checking](#building-and-checking)
 - [Key design decisions](#key-design-decisions)
@@ -458,6 +459,22 @@ A login start is quiet. `LoginItem.launchedAtLogin` reads the open-app Apple eve
 as a login-item launch, and `AppDelegate` then skips opening the window: Stanza starts in the menu bar only, as an
 accessory app with no Dock icon, until the window is asked for. Opening Stanza any other way shows the window.
 
+## Keyboard shortcuts
+
+`GlobalShortcuts` (`Sources/GlobalShortcuts.swift`) registers the shortcuts recorded in Settings with Carbon's
+`RegisterEventHotKey`. It works while another app is in front, needs no Accessibility permission, and the app sees only
+its own key combinations, never other typing. Each shortcut is stored as `shortcut.<action>` in the user defaults: the
+key code, the Carbon modifiers and the label shown in Settings. No key means no shortcut, which is the default.
+
+Recording uses a local key monitor while the Settings row waits, with every shortcut unregistered meanwhile. A
+combination needs two of ⌃ ⌥ ⌘: one ⌘ or ⌃ would take ⌘V or ⌃A away from every app, macOS 15 blocked shortcuts that
+use only ⌥ and ⇧, and a bare key would fire while typing. Recording ends if Stanza stops being the active app, and it
+only takes keys typed into the window that started it.
+The same keys cannot be set for two actions, and a combination the system refuses is shown as taken. **Show or hide
+the lyrics** toggles `showWhenUnlocked`, the same switch as the menu and the Lock Screen panel, so there is no second
+hidden state. **Next style** follows `AppSettings.nextStyle`: the Favourites in gallery order, or with none, every
+style in the menu's order.
+
 ## Data and settings
 
 ```mermaid
@@ -544,7 +561,7 @@ artwork is fetched only when a setting or style uses it.
 | Area | Files |
 |---|---|
 | Entry and tools | `main.swift`, `Diagnostics.swift`, `GalleryDiagnostics.swift`, `Log.swift` |
-| App and menu | `AppDelegate.swift`, `AppSettings.swift`, `SystemState.swift`, `LoginItem.swift` |
+| App and menu | `AppDelegate.swift`, `AppSettings.swift`, `SystemState.swift`, `LoginItem.swift`, `GlobalShortcuts.swift`, `ShortcutViews.swift` |
 | Players | `NowPlayingMonitor.swift`, `PlayerLink.swift`, `PlayerSteps.swift` |
 | Lyrics | `LyricsProvider.swift`, `LyricsParsing.swift`, `Model.swift`, `LyricEngine.swift` |
 | Overlay | `OverlayView.swift`, `OverlayWindows.swift`, `LyricPlacement.swift`, `SizeSlider.swift`, `ScrollAdjust.swift` |
