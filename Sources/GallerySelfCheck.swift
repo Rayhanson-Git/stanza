@@ -176,6 +176,22 @@ private func shellChecks() -> [String] {
                  && AppSettings.nextStyle(after: all[5], favourites: favourites) == all[2]
                  && AppSettings.nextStyle(after: all[0], favourites: favourites) == all[2],
                  "next style: through the favourites only; from another style, to the first favourite")
+    // What's New: the changelog read back, and which releases a copy is shown.
+    let sample = WhatsNew.parse("# Changelog\n\nIntro.\n\n## 0.4.10\n\n- **Bold** note\n  that wraps\n- Two:\n  - sub\n\n## 0.4.9\n\n- Old\n\n## 0.4.1\n\n- Older\n")
+    checks.check(sample.map(\.version) == ["0.4.10", "0.4.9", "0.4.1"] && WhatsNew.parse("## 0.5.0 (soon)\n- x").first?.version == "0.5.0"
+                 && sample[0].items == [.init(text: "**Bold** note that wraps", indented: false), .init(text: "Two:", indented: false),
+                                        .init(text: "sub", indented: true)], "what's new: sections, notes, sub-notes and wrapped lines parsed")
+    checks.check(WhatsNew.isNewer("0.4.10", than: "0.4.9") && !WhatsNew.isNewer("0.4.9", than: "0.4.9") && WhatsNew.isNewer("1.0", than: "0.9.9"),
+                 "what's new: versions compared number by number")
+    checks.check(WhatsNew.toShow(in: sample, current: "0.4.10", lastSeen: nil, onboardingDone: true).map(\.version) == ["0.4.10", "0.4.9"]
+                 && WhatsNew.toShow(in: sample, current: "0.4.10", lastSeen: "0.4.9", onboardingDone: true).map(\.version) == ["0.4.10"]
+                 && WhatsNew.toShow(in: sample, current: "0.4.10", lastSeen: "0.4.10", onboardingDone: true).isEmpty
+                 && WhatsNew.toShow(in: sample, current: "0.4.9", lastSeen: "0.4.1", onboardingDone: true).map(\.version) == ["0.4.9"]
+                 && WhatsNew.toShow(in: sample, current: "0.4.10", lastSeen: nil, onboardingDone: false).isEmpty,
+                 "what's new: everything since the last one seen (after 0.4.7 for older copies), once; nothing for a new user")
+    let topNotes = WhatsNew.bundled().first?.version ?? "none"
+    checks.check(topNotes == AppUpdater.currentVersion,
+                 "what's new: CHANGELOG.md in the app must start with notes for \(AppUpdater.currentVersion), but its first is \(topNotes)")
     checks.check(fetchable.count == 2 && fetchable.allSatisfy(ArtworkColorSync.isFetchable)
                  && refused.count == 4 && !refused.contains(where: ArtworkColorSync.isFetchable), "album art is fetched over https only")
     return checks.failures

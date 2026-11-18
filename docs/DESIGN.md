@@ -346,7 +346,10 @@ window ("Restart to update", `UpdatePill` in `UpdateViews.swift`) and the menu i
 login keeps the same rule: a login start brings only the menu bar icon, because a window jumping up while the Mac
 is still starting is noise, not help. Stanza is already working by then; the window is there when it is asked for. Keyboard shortcuts follow it too: none are set until you record one, because a
 shortcut nobody chose can clash with another app's or fire by surprise, and the lyrics' own switches stay the only
-state, so a shortcut never leaves the menu and the window disagreeing.
+state, so a shortcut never leaves the menu and the window disagreeing. What's New is the one thing that opens unasked, and
+only once per update, inside the window and only when you open it: an update that changes the app without saying
+how is worse than one short card. It sits where Settings opens, so it reads as part of the app, and closes like any
+other panel.
 The one moment the app needs something from you is the one moment it shows.
 
 ### The menu bar

@@ -260,6 +260,8 @@ window, also follows the mouse wheel and a two-finger swipe.
 - The overlay steps aside on the display where the Stanza window is in use, so lyrics never play over their own
   previews.
 - When the music has been paused for 5 seconds, the lyrics fade away; they come back as soon as it plays.
+- After an update, the window opens once with **What's New**: what changed since the version you had. When Stanza
+  starts at login it waits until you open the window.
 - Between lines most styles clear the screen. Departure Board, Receipt and the phone screens stay up through pauses,
   and some of them dim.
 - With macOS **Reduce motion** on, most styles drop their decorative motion and the window's large preview holds
@@ -280,7 +282,7 @@ No other permission is needed. Stanza does not ask for your location, microphone
 
 ## Status and limits
 
-Version 0.4.7.
+Version 0.4.8.
 
 - **Not notarised.** Releases are signed with the project's own certificate, not an Apple developer identity, so the
   first time you open a downloaded copy macOS blocks it until you allow it (see [Install](#install)).
@@ -400,7 +402,9 @@ scripts/release.sh --publish   # the same, then the GitHub release
 The script builds the app, makes the disk image, signs it for the updater, writes the update feed with the
 version's changelog section as its notes, and with `--publish` creates the GitHub release, but only from a clean
 working tree that matches `origin/main`. Installed copies read the feed attached to the latest release, so publishing
-a release is what makes them update. The whole pipeline is described in
+a release is what makes them update. The changelog section is also what people see after updating: the app carries
+`CHANGELOG.md`, and the first time its window opens on a new version it shows the notes of every release since the
+one last seen, once, in a **What's New** card. The whole pipeline is described in
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md#updates-and-releases).
 
 Two keys live in the maintainer's login Keychain, never in this repository:
@@ -418,7 +422,7 @@ Both are backed up outside this Mac. On a new Mac, import the certificate's `.p1
 ## Project layout
 
 ```text
-Sources/            the app: 67 Swift files, about 17,000 lines
+Sources/            the app: 68 Swift files, about 17,000 lines
   main.swift          entry point and the command-line tools
   AppDelegate.swift   the menu-bar menu and app lifecycle
   GlobalShortcuts.swift, ShortcutViews.swift  keyboard shortcuts and their rows in Settings
@@ -430,6 +434,7 @@ Sources/            the app: 67 Swift files, about 17,000 lines
   *Style.swift and their helpers              how each style draws (WordStackStyle.swift covers the stacks)
   Gallery*.swift, PlayerPanel.swift, OnboardingView.swift   the window
   AppUpdater.swift, UpdateViews.swift        the updater, and its controls in the menu and window
+  WhatsNew.swift      the What's New card shown once after an update
   SelfCheck.swift, GallerySelfCheck.swift     the self-check
 Resources/          app icon, logo, menu-bar mark and the disk-image background
 Info.plist          bundle ID tech.rayhanson.stanza, macOS 15 minimum, the update feed and key

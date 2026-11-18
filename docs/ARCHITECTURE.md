@@ -405,6 +405,15 @@ the feed at `SUFeedURL` (the `appcast.xml` attached to the latest GitHub release
 EdDSA signature matches `SUPublicEDKey` in `Info.plist`. The updater is started only by a normal launch, so the
 command-line tools never go online.
 
+**What's New.** `build.sh` copies `CHANGELOG.md` into the app. When the window's model is made (the first time the
+window opens in a session, so a quiet login start does not count), `WhatsNew` (`Sources/WhatsNew.swift`) reads it and
+picks the releases newer than `lastSeenVersion` in the user defaults, up to the running version. If there are any,
+the window opens with the What's New card, and `lastSeenVersion` becomes the running version (never lower, and never
+when the notes failed to load), so it is shown once. A
+new user gets the first-run introduction instead. Copies from before 0.4.8 have no `lastSeenVersion` and count from
+0.4.7, so they see 0.4.8's notes, which round up the features and fixes of 0.4.1 to 0.4.7. The self-check fails if
+the bundled changelog does not start with the running version, so no release ships without its notes.
+
 **Making a release** (`scripts/release.sh`):
 
 <p align="center">
@@ -568,5 +577,5 @@ artwork is fetched only when a setting or style uses it.
 | Styles | `WordStackStyle.swift`, `*Style.swift`, `MoneyFeed.swift`, `MoneyPlan.swift`, `MoneyMapPictures.swift`, `NotificationsFeed.swift`, `NotificationsPlan.swift`, `MapTour.swift`, `WordVisuals.swift` |
 | Colours | `ArtworkColorSync.swift` |
 | Window | `Gallery*.swift`, `StyleDemo.swift`, `StyleStills.swift`, `StyleBackdrop.swift`, `PlayerPanel.swift`, `OnboardingView.swift`, `UpdateViews.swift`, `AboutViews.swift` |
-| Updates | `AppUpdater.swift`, `scripts/release.sh`, `Info.plist` |
+| Updates | `AppUpdater.swift`, `WhatsNew.swift`, `scripts/release.sh`, `Info.plist`, `CHANGELOG.md` |
 | Checks | `SelfCheck.swift`, `GallerySelfCheck.swift` |

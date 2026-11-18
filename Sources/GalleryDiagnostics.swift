@@ -9,7 +9,7 @@ import SwiftUI
 /// hero the tilted words of Ship, Visual and the Fisheye styles land in the wrong place (try
 /// `-lyricStyle Branches`). Tiles are drawn by SwiftUI itself and are exact.
 extension Diagnostics {
-    static let galleryViews = ["none", "size", "font", "lockscreen", "aesthetics", "spotify", "music", "settings", "about",
+    static let galleryViews = ["none", "size", "font", "lockscreen", "aesthetics", "spotify", "music", "settings", "about", "whatsnew",
                                "onboarding", "onboarding-player", "onboarding-style", "onboarding-done", "shelf"]
     static let gallerySize = CGSize(width: 1180, height: 740)
     /// Tall enough to show every row of the shelf, which the window itself would scroll.
@@ -28,10 +28,12 @@ extension Diagnostics {
         let monitor = NowPlayingMonitor()
         let model = GalleryModel(settings: settings, engine: LyricEngine(monitor: monitor, settings: settings), monitor: monitor,
                                  playerLink: PlayerLink(),
-                                 updater: view == "settings" ? AppUpdater() : nil, onboarding: view.hasPrefix("onboarding"), watchPlayers: false)
+                                 updater: view == "settings" ? AppUpdater() : nil, onboarding: view.hasPrefix("onboarding"), watchPlayers: false,
+                                 showsWhatsNew: false)
         defer { model.shutDown() }
         let menus: [String: GalleryMenu] = ["size": .size, "font": .font, "lockscreen": .lockScreen, "aesthetics": .aesthetics,
-                                            "spotify": .spotify, "music": .music, "settings": .settings, "about": .about]
+                                            "spotify": .spotify, "music": .music, "settings": .settings, "about": .about,
+                                            "whatsnew": .whatsNew]
         model.menu = menus[view]
         let onboardingSteps = ["onboarding-player": 1, "onboarding-style": 2, "onboarding-done": 3]
         (0..<(onboardingSteps[view] ?? 0)).forEach { _ in model.advanceOnboarding() }

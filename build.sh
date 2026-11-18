@@ -27,6 +27,8 @@ swiftc -O -swift-version 5 -target arm64-apple-macosx15.0 Sources/*.swift -o "$A
 cp Info.plist "$APP/Contents/Info.plist"
 # The app icon and the menu-bar mark (made by design/logo/quatrain_variations.swift --icon).
 cp Resources/Stanza.icns Resources/StanzaMenuBar.png Resources/StanzaMenuBar@2x.png "$APP/Contents/Resources/"
+# The release notes, for the What's New card shown once after an update.
+cp CHANGELOG.md "$APP/Contents/Resources/"
 # Sparkle keeps its own signature; ditto keeps the framework's symlinks intact.
 rm -rf "$APP/Contents/Frameworks" && mkdir -p "$APP/Contents/Frameworks"
 ditto "$SPARKLE_DIR/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"

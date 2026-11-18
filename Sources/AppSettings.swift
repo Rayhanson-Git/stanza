@@ -73,6 +73,7 @@ final class AppSettings: ObservableObject {
         static let mapIn3D = "mapIn3D", mapFillsDisplay = "mapFillsDisplay"
         static let pinnedStyles = "pinnedStyles", onboardingDone = "onboardingDone"
         static let lyricOffsetX = "lyricOffsetX", lyricOffsetY = "lyricOffsetY"
+        static let lastSeenVersion = "lastSeenVersion"
     }
 
     private let defaults = UserDefaults.standard
@@ -105,6 +106,11 @@ final class AppSettings: ObservableObject {
     func lyricOffset(for style: LyricStyle) -> CGPoint { style == .map && mapFillsDisplay ? .zero : lyricOffset }
     /// False until the first-run introduction in the window has been finished once.
     @Published var onboardingDone: Bool { didSet { defaults.set(onboardingDone, forKey: Key.onboardingDone) } }
+    /// The version whose What's New was last shown, or that this Mac started on. Nil in copies from before 0.4.8.
+    var lastSeenVersion: String? {
+        get { defaults.string(forKey: Key.lastSeenVersion) }
+        set { defaults.set(newValue, forKey: Key.lastSeenVersion) }
+    }
     /// The system "Reduce motion" accessibility setting; styles drop their decorative wobble when it is on.
     var reduceMotion: Bool { NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
     @Published var disabledDisplays: Set<UInt32> {

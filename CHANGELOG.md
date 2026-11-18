@@ -2,6 +2,20 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.8
+
+- **What's New**: after each update, Stanza shows what changed, once, the first time you open its window. Opened at login, it waits until you open the window.
+- New and fixed since 0.4.1:
+  - **Keyboard shortcuts**: show or hide the lyrics, or move to the next style, from any app. None are on until you set them in Settings.
+  - **A quiet start at login**: Stanza waits in the menu bar instead of opening its window while your Mac starts.
+  - **Lyrics fade sooner**: 5 seconds into a pause, down from 10, and back the moment music plays.
+  - **Favourites**: star the styles you like; the menu bar menu then lists only those.
+  - **Songs in English letters**: Hindi, Urdu, Punjabi and Bengali lyrics show in English letters when a version exists.
+  - **More songs found**, even when the lyrics database spells the artist a little differently.
+  - **Departure Board and Receipt** stay on screen through pauses, and now draw Bengali, Hindi, Urdu and other joined scripts correctly.
+  - **Sliders** move with the mouse wheel or a two-finger swipe, and Size now goes down to 25%.
+  - **A cleaner window**: the lyric settings sit in a pill at the bottom, the players in a pill under the Settings gear, and the previews are bigger.
+
 ## 0.4.7
 
 - Keyboard shortcuts, off until you set them. In Settings (the gear), record one to show or hide the lyrics and one to move to the next style, from any app. A shortcut uses two of ⌃ ⌥ ⌘ (⌃⌥L, say), so it never takes copy, paste and the like away from other apps. Show or hide uses the same switch as Show When Unlocked, so the lock screen keeps its lyrics; Next style goes through your Favourites, or every style when you have none.
