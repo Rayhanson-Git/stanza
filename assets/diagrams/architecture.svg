@@ -146,7 +146,7 @@
   <rect x="40" y="546" width="174" height="92" rx="14" fill="#10202B" stroke="#2E6F73" stroke-width="1.5"/>
   <text x="54" y="572" class="bt">AppDelegate</text>
   <text x="54" y="593" class="bl">menu bar, one copy</text>
-  <text x="54" y="610" class="bl">only, 10 s pause fade</text>
+  <text x="54" y="610" class="bl">only, 5 s pause fade</text>
 
   <rect x="228" y="546" width="174" height="92" rx="14" fill="#10202B" stroke="#2E6F73" stroke-width="1.5"/>
   <text x="242" y="572" class="bt">AppSettings</text>

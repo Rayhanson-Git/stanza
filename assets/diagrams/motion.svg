@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 980" width="1200" height="980" role="img" aria-labelledby="t d">
   <title id="t">Stanza motion system</title>
-  <desc id="d">Three studies. One: the player pill widens on hover and grows into its card on a click, every part on one spring with response 0.5 and damping 0.82, the panel content 0.1 s behind. Two: a settings panel rolls up out of its button, scaling from 0.3 on a spring with response 0.3 and damping 0.84. Three: lyrics dim to 55 percent after 5 s of quiet and wake 2 s before the next line, and the whole overlay fades out 10 s into a pause.</desc>
+  <desc id="d">Three studies. One: the player pill widens on hover and grows into its card on a click, every part on one spring with response 0.5 and damping 0.82, the panel content 0.1 s behind. Two: a settings panel rolls up out of its button, scaling from 0.3 on a spring with response 0.3 and damping 0.84. Three: lyrics dim to 55 percent after 5 s of quiet and wake 2 s before the next line, and the whole overlay fades out 5 s into a pause.</desc>
   <style>
     text { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif; fill: #EADCC8; }
     .h1 { font-size: 26px; font-weight: 700; }
@@ -153,9 +153,9 @@
       <line x1="225" y1="-6" x2="225" y2="120"/><line x1="315" y1="-6" x2="315" y2="120"/>
     </g>
     <text x="0" y="136" class="ax">paused</text>
-    <text x="225" y="136" class="ax" text-anchor="middle">10 s</text>
+    <text x="225" y="136" class="ax" text-anchor="middle">5 s</text>
     <text x="315" y="136" class="ax" text-anchor="middle">plays</text>
     <text x="252" y="64" class="al hot">0.8 s ease-out</text>
   </g>
-  <text x="720" y="958" class="sd">Every style: gone after 10 s of pause, back the instant music plays.</text>
+  <text x="720" y="958" class="sd">Every style: gone after 5 s of pause, back the instant music plays.</text>
 </svg>

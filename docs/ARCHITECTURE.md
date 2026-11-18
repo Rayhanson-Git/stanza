@@ -265,7 +265,7 @@ Screen Awake** is on). `LockMonitor` learns about locking from distributed notif
 as a safety net.
 
 **Costing nothing when idle.** The overlay view is a `TimelineView(.animation)` that is paused when there are no
-lyrics, nothing is playing, the window has the display, or the music has been paused for 10 seconds (when the whole
+lyrics, nothing is playing, the window has the display, or the music has been paused for 5 seconds (when the whole
 overlay also fades away). A paused timeline does not redraw.
 
 ## The per-frame render pipeline

@@ -2,6 +2,10 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.6
+
+- The lyrics now fade away 5 seconds after you pause the music, instead of 10. They still come back the moment it plays again.
+
 ## 0.4.5
 
 - When Stanza opens at login, it now starts quietly in the menu bar: the window no longer pops up while your Mac is starting. Open it from the menu bar icon whenever you want it. Opening Stanza yourself still shows the window as before.

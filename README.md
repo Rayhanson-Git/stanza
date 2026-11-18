@@ -78,7 +78,7 @@ in silence, and never ask for attention they have not earned. No accounts, no an
   </tr>
   <tr>
     <td valign="top"><b>Same size, any style</b><br>Every style was measured and balanced, so the same Size fills about the same part of the screen.</td>
-    <td valign="top"><b>Calm</b><br>Lyrics step back in long gaps, fade 10 seconds into a pause, and honour Reduce Motion in the window and in 14 styles.</td>
+    <td valign="top"><b>Calm</b><br>Lyrics step back in long gaps, fade 5 seconds into a pause, and honour Reduce Motion in the window and in 14 styles.</td>
     <td valign="top"><b>Quiet</b><br>No accounts, no analytics, no telemetry. It stops drawing whenever nothing can be seen.</td>
   </tr>
 </table>
@@ -250,7 +250,7 @@ window, also follows the mouse wheel and a two-finger swipe.
 
 - The overlay steps aside on the display where the Stanza window is in use, so lyrics never play over their own
   previews.
-- When the music has been paused for 10 seconds, the lyrics fade away; they come back as soon as it plays.
+- When the music has been paused for 5 seconds, the lyrics fade away; they come back as soon as it plays.
 - Between lines most styles clear the screen. Departure Board, Receipt and the phone screens stay up through pauses,
   and some of them dim.
 - With macOS **Reduce motion** on, most styles drop their decorative motion and the window's large preview holds
@@ -271,7 +271,7 @@ No other permission is needed. Stanza does not ask for your location, microphone
 
 ## Status and limits
 
-Version 0.4.4.
+Version 0.4.6.
 
 - **Not notarised.** Releases are signed with the project's own certificate, not an Apple developer identity, so the
   first time you open a downloaded copy macOS blocks it until you allow it (see [Install](#install)).

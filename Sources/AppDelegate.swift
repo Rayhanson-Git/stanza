@@ -33,7 +33,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
                                                 slideLyrics: { [weak self] share in self?.overlays.slide(by: share) })
     /// Puts the lyrics away once nothing has played for `idleDelay` seconds.
     private var idleTimer: DispatchWorkItem?
-    private static let idleDelay = 10.0
+    private static let idleDelay = 5.0
     private var observers: Set<AnyCancellable> = []
     private weak var textScaleSlider: SizeSlider?
 

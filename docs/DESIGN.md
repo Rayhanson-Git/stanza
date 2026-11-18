@@ -115,7 +115,7 @@ and 14 of the 23 styles drop their decorative motion while keeping the motion th
 ### 8. Nothing runs that nobody can see (calm technology)
 
 A lyrics app runs for hours in the background, so restraint is part of the design. The overlay's `TimelineView` is
-paused with no lyrics, no music, on the display where the window is in use, and after 10 s of pause (when the
+paused with no lyrics, no music, on the display where the window is in use, and after 5 s of pause (when the
 overlay also fades away). The window pauses when hidden, covered or locked; tiles fall back to still pictures while
 the page scrolls (`GalleryModel.tilesStillOnly`); the player panels poll only while shown. Calm is also visual:
 long instrumental gaps dim the styles that stay on screen instead of leaving them shouting.
@@ -190,7 +190,7 @@ Codestyle), with dark corners and the accent low on the right. A gradient over t
 ## Motion system
 
 <p align="center">
-  <img src="../assets/diagrams/motion.svg" alt="Motion diagram: the player pill at rest, pointed at and open as a card, on one spring with the panel content 0.1 s behind; a settings panel scaling up from 0.3 out of its button; a chart of lyrics dimming to 55% after 5 s of quiet and waking 2 s before the next line; a chart of the overlay fading out over 0.8 s after 10 s of pause" width="100%">
+  <img src="../assets/diagrams/motion.svg" alt="Motion diagram: the player pill at rest, pointed at and open as a card, on one spring with the panel content 0.1 s behind; a settings panel scaling up from 0.3 out of its button; a chart of lyrics dimming to 55% after 5 s of quiet and waking 2 s before the next line; a chart of the overlay fading out over 0.8 s after 5 s of pause" width="100%">
 </p>
 
 ### Springs for touch, eases for time
@@ -221,7 +221,7 @@ Stanza uses two families of motion, and the split is deliberate.
 | Word pictures | spring | emoji: response 0.3, damping 0.25, swinging in from −14°; symbols: the system wiggle at 1.5× | Low damping gives a playful bounce to a decoration that should feel alive. |
 | Sway (Ship, Visual) | sine of the clock | yaw 16°, pitch 7°, scale 3.5%, at 0.35, 0.22 and 0.17 radians a second | Three unrelated slow periods never visibly repeat; words keep their places relative to each other, so it reads as depth, not shake. |
 | Gaps (stay-on styles) | smoothstep | after 5 s of quiet, dim by 0.45 over 2 s; wake between 2.8 and 2 s before the next line; after the last line, fade out from 4 s to 6.5 s | Steps back instead of vanishing, and is fully awake before the singer returns. |
-| Pause | ease-out | after 10 s of pause, fade to nothing over 0.8 s; back instantly on play | Patient to leave, eager to return: music coming back should never wait for an animation. |
+| Pause | ease-out | after 5 s of pause, fade to nothing over 0.8 s; back instantly on play | Patient to leave, eager to return: music coming back should never wait for an animation. |
 
 Sources: `PlayerPanel.swift` (`PlayerDock.motion`, `contentDelay`), `GalleryView.swift`, `GalleryHero.swift`,
 `GalleryShelf.swift`, `GalleryChrome.swift`, `OverlayView.swift` (`Layout`, `GapDimming`, `WordIcon`),
@@ -265,7 +265,7 @@ A song is not continuous text. Three behaviours, chosen per style, handle the si
 - **Show what is coming.** Map, Calendar and Voice Memo stay at full strength and tell you what is next instead: the
   next leg announced, a "Free until…" chip, the next take waiting.
 
-And whatever the style, the overlay fades away after 10 s of pause and is back the moment music plays.
+And whatever the style, the overlay fades away after 5 s of pause and is back the moment music plays.
 
 ### Dragging without lag
 

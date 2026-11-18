@@ -76,7 +76,7 @@ shifts it by the saved offset.
   gap and after the last line, because they show history. Messages, Money and Notifications dim in long silences
   with the same timings; Map, Calendar and Voice Memo stay at full strength and say what is coming next instead.
 
-Separately, the whole overlay fades away once the music has been paused for 10 seconds, whatever the style.
+Separately, the whole overlay fades away once the music has been paused for 5 seconds, whatever the style.
 
 **Readable over any wallpaper.** The overlay is transparent and sits on top of whatever is behind it, from a white
 document to a black lock screen. So every style either carries a soft dark shadow or brings its own opaque surface
