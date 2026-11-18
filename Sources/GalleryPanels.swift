@@ -42,7 +42,6 @@ struct GalleryPanel: View {
         case .spotify, .music: EmptyView() // drawn by PlayerDock
         case .settings: SettingsPanel(model: model, loginItem: model.loginItem, updater: model.updater)
         case .about: AboutPanel(model: model)
-        case .whatsNew: WhatsNewPanel(model: model)
         }
     }
 }

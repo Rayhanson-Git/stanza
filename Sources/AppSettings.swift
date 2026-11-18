@@ -73,7 +73,8 @@ final class AppSettings: ObservableObject {
         static let mapIn3D = "mapIn3D", mapFillsDisplay = "mapFillsDisplay"
         static let pinnedStyles = "pinnedStyles", onboardingDone = "onboardingDone"
         static let lyricOffsetX = "lyricOffsetX", lyricOffsetY = "lyricOffsetY"
-        static let lastSeenVersion = "lastSeenVersion"
+        // Renamed in 0.4.9 so copies that had only the easily missed 0.4.8 panel see the notes again, in the pop-up.
+        static let lastSeenVersion = "whatsNewSeenVersion"
     }
 
     private let defaults = UserDefaults.standard
@@ -106,7 +107,7 @@ final class AppSettings: ObservableObject {
     func lyricOffset(for style: LyricStyle) -> CGPoint { style == .map && mapFillsDisplay ? .zero : lyricOffset }
     /// False until the first-run introduction in the window has been finished once.
     @Published var onboardingDone: Bool { didSet { defaults.set(onboardingDone, forKey: Key.onboardingDone) } }
-    /// The version whose What's New was last shown, or that this Mac started on. Nil in copies from before 0.4.8.
+    /// The version whose What's New was last shown, or that this Mac started on. Nil in copies from before 0.4.9.
     var lastSeenVersion: String? {
         get { defaults.string(forKey: Key.lastSeenVersion) }
         set { defaults.set(newValue, forKey: Key.lastSeenVersion) }

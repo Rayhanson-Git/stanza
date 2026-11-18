@@ -2,6 +2,10 @@
 
 Each release's notes. `scripts/release.sh` copies the section for the version it builds into the GitHub release and into the update window.
 
+## 0.4.9
+
+- **What's New** now pops up in the middle of the window, so it is hard to miss; close it with OK. The 0.4.8 notes below are shown again for anyone who missed them in the small panel.
+
 ## 0.4.8
 
 - **What's New**: after each update, Stanza shows what changed, once, the first time you open its window. Opened at login, it waits until you open the window.

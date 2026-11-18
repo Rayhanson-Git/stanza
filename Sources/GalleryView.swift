@@ -75,6 +75,22 @@ struct GalleryView: View {
             }
         }
         .animation(calm ? .easeInOut(duration: 0.2) : .spring(response: 0.3, dampingFraction: 0.84), value: model.menu)
+        // The page behind sleeps while What's New is up: no clicks, arrows or Return reach it.
+        .disabled(model.whatsNewOpen)
+        .overlay { whatsNew(in: size, calm: calm) }
+        .onAppear { model.presentWhatsNew() }
+    }
+
+    /// What's New over a dimmed window. The dimmed page takes the clicks, so only OK closes it.
+    @ViewBuilder private func whatsNew(in size: CGSize, calm: Bool) -> some View {
+        if model.whatsNewOpen {
+            ZStack {
+                Color.black.opacity(0.6).contentShape(Rectangle()).onTapGesture {}.transition(.opacity)
+                WhatsNewCard(model: model, maxHeight: size.height - 2 * WhatsNewCard.margin)
+                    .transition(calm ? .opacity : .scale(scale: 0.6).combined(with: .opacity))
+            }
+            .frame(width: size.width, height: size.height)
+        }
     }
 
     /// A lyric setting's panel: above the bar, centred on its button and unfolding from it.
@@ -112,11 +128,11 @@ struct GalleryView: View {
         }
     }
 
-    /// An invisible button that gives Esc its job: close the open panel.
+    /// An invisible button that gives Esc its job: close What's New or the open panel.
     private var escapeKey: some View {
-        Button("Close panel") { model.menu = nil }
+        Button("Close panel") { model.whatsNewOpen ? model.dismissWhatsNew() : (model.menu = nil) }
             .keyboardShortcut(.cancelAction)
-            .disabled(model.menu == nil)
+            .disabled(model.menu == nil && !model.whatsNewOpen)
             .opacity(0)
             .accessibilityHidden(true)
     }

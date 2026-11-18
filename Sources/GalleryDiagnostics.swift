@@ -32,9 +32,9 @@ extension Diagnostics {
                                  showsWhatsNew: false)
         defer { model.shutDown() }
         let menus: [String: GalleryMenu] = ["size": .size, "font": .font, "lockscreen": .lockScreen, "aesthetics": .aesthetics,
-                                            "spotify": .spotify, "music": .music, "settings": .settings, "about": .about,
-                                            "whatsnew": .whatsNew]
+                                            "spotify": .spotify, "music": .music, "settings": .settings, "about": .about]
         model.menu = menus[view]
+        model.whatsNewOpen = view == "whatsnew"
         let onboardingSteps = ["onboarding-player": 1, "onboarding-style": 2, "onboarding-done": 3]
         (0..<(onboardingSteps[view] ?? 0)).forEach { _ in model.advanceOnboarding() }
 

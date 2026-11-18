@@ -407,11 +407,13 @@ command-line tools never go online.
 
 **What's New.** `build.sh` copies `CHANGELOG.md` into the app. When the window's model is made (the first time the
 window opens in a session, so a quiet login start does not count), `WhatsNew` (`Sources/WhatsNew.swift`) reads it and
-picks the releases newer than `lastSeenVersion` in the user defaults, up to the running version. If there are any,
-the window opens with the What's New card, and `lastSeenVersion` becomes the running version (never lower, and never
-when the notes failed to load), so it is shown once. A
-new user gets the first-run introduction instead. Copies from before 0.4.8 have no `lastSeenVersion` and count from
-0.4.7, so they see 0.4.8's notes, which round up the features and fixes of 0.4.1 to 0.4.7. The self-check fails if
+picks the releases newer than `whatsNewSeenVersion` in the user defaults, up to the running version. If there are
+any, `WhatsNewCard` springs up over the dimmed window once it is on screen (a fade with Reduce Motion). The page
+behind is disabled until **OK**, Return or Esc closes it. Only when it is up does the seen version become the running
+one (never lower), so a window closed first, or notes that failed to load, show it next time instead of losing it. A new user gets the first-run introduction instead. Copies with no
+seen version count from 0.4.7, so they see 0.4.8's roundup of the features and fixes of 0.4.1 to 0.4.7 too. That
+includes 0.4.8 copies: 0.4.8 kept the seen version under another key and showed the notes in a small panel, easy to
+miss, so 0.4.9 starts the count again. The self-check fails if
 the bundled changelog does not start with the running version, so no release ships without its notes.
 
 **Making a release** (`scripts/release.sh`):

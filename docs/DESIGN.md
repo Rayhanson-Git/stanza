@@ -348,8 +348,9 @@ is still starting is noise, not help. Stanza is already working by then; the win
 shortcut nobody chose can clash with another app's or fire by surprise, and the lyrics' own switches stay the only
 state, so a shortcut never leaves the menu and the window disagreeing. What's New is the one thing that opens unasked, and
 only once per update, inside the window and only when you open it: an update that changes the app without saying
-how is worse than one short card. It sits where Settings opens, so it reads as part of the app, and closes like any
-other panel.
+how is worse than one short card. Because it comes once, it is allowed to be seen: it pops up in the middle of the
+window over a dimmed page, on an underdamped spring (response 0.55, damping 0.55) that overshoots by about a tenth
+and settles back, and it waits for OK. A first try as a corner panel proved easy to miss.
 The one moment the app needs something from you is the one moment it shows.
 
 ### The menu bar

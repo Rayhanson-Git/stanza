@@ -3,7 +3,7 @@ import SwiftUI
 
 /// The window's panels. Only one is open at a time.
 enum GalleryMenu: String, CaseIterable {
-    case size, font, lockScreen, aesthetics, spotify, music, settings, about, whatsNew
+    case size, font, lockScreen, aesthetics, spotify, music, settings, about
 
     /// The lyric settings in the bar at the bottom centre; the players and Settings sit at the top right.
     static let lyricSettings: [GalleryMenu] = [.size, .font, .lockScreen, .aesthetics]
@@ -23,7 +23,6 @@ enum GalleryMenu: String, CaseIterable {
         case .music: return Player.music.displayName
         case .settings: return "Settings"
         case .about: return "About Stanza"
-        case .whatsNew: return "What's New"
         }
     }
 
@@ -110,8 +109,12 @@ final class GalleryModel: ObservableObject {
     @Published private(set) var scrolling = false { didSet { applyPause() } }
     @Published var heroOffscreen = false
     @Published private(set) var onboarding: Bool
-    /// The release notes the What's New card shows: those not seen yet, once, after an update.
+    /// The release notes the What's New pop-up shows: those not seen yet, once, after an update.
     @Published private(set) var whatsNew: [ReleaseNotes]
+    /// The What's New pop-up is on screen.
+    @Published var whatsNewOpen = false
+    /// Waiting for the window to appear, so the pop-up's bounce is seen.
+    private var whatsNewPending = false
     @Published private(set) var onboardingStep = OnboardingStep.welcome
     private var scrollEnd: DispatchWorkItem?
     private let watchesPlayers: Bool
@@ -133,13 +136,8 @@ final class GalleryModel: ObservableObject {
         self.onboarding = showsOnboarding
         let releases = WhatsNew.bundled(), current = AppUpdater.currentVersion
         if showsWhatsNew {
-            // Seen once the window has opened with it; a quiet login start does not count until the window is opened.
             whatsNew = WhatsNew.toShow(in: releases, current: current, lastSeen: settings.lastSeenVersion,
                                        onboardingDone: !showsOnboarding)
-            // Never on missing notes (they would be lost), and never lowered by running an older copy.
-            if !releases.isEmpty, settings.lastSeenVersion.map({ WhatsNew.isNewer(current, than: $0) }) ?? true {
-                settings.lastSeenVersion = current
-            }
         } else {
             // The render tool previews what a copy from before What's New is shown, and records nothing.
             whatsNew = WhatsNew.unseen(in: releases, current: current, lastSeen: WhatsNew.baseline)
@@ -148,7 +146,10 @@ final class GalleryModel: ObservableObject {
         // The Visual styles need their word pictures looked up before the first preview is drawn.
         WordVisuals.shared.prepare(words: DemoTrack.lyrics.words.map(\.text))
         playerLink.isWatched = watchPlayers
-        if showsWhatsNew, !whatsNew.isEmpty { menu = .whatsNew }
+        whatsNewPending = showsWhatsNew && !whatsNew.isEmpty
+        // With notes to show, they count as seen only once the pop-up is up (presentWhatsNew); with none, now.
+        // Never on notes that failed to load, which would lose them.
+        if showsWhatsNew, whatsNew.isEmpty, !releases.isEmpty { recordWhatsNewSeen() }
     }
 
     /// Called when the window closes: nothing may keep polling on its behalf afterwards.
@@ -156,6 +157,34 @@ final class GalleryModel: ObservableObject {
         isShutDown = true
         scrollEnd?.cancel()
         playerLink.isWatched = false
+    }
+
+    // MARK: What's New
+
+    private static let whatsNewDelay = 0.45
+
+    /// Springs the pop-up in a moment after the window comes up: it overshoots and settles back, a small kick that
+    /// says "look here". With Reduce Motion it fades in.
+    func presentWhatsNew() {
+        guard whatsNewPending else { return }
+        whatsNewPending = false
+        let calm = settings.reduceMotion
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.whatsNewDelay) { [weak self] in
+            // A window closed before then shows it next time, since nothing was recorded.
+            guard let self, !isShutDown else { return }
+            withAnimation(calm ? .easeOut(duration: 0.25) : .spring(response: 0.55, dampingFraction: 0.55)) { self.whatsNewOpen = true }
+            recordWhatsNewSeen()
+        }
+    }
+
+    /// Never lowered by running an older copy, so a later update is not announced twice.
+    private func recordWhatsNewSeen() {
+        let current = AppUpdater.currentVersion
+        if settings.lastSeenVersion.map({ WhatsNew.isNewer(current, than: $0) }) ?? true { settings.lastSeenVersion = current }
+    }
+
+    func dismissWhatsNew() {
+        withAnimation(.easeIn(duration: 0.18)) { whatsNewOpen = false }
     }
 
     // MARK: Browsing

@@ -11,7 +11,8 @@ struct ReleaseNotes: Equatable {
     let items: [Item]
 }
 
-/// What's New: the first time the window opens after an update, the notes of every release since the one last seen.
+/// What's New: the first time the window opens after an update, a pop-up with the notes of every release since the
+/// one last seen.
 /// The notes are CHANGELOG.md, copied into the app by build.sh, so they are the same text as the GitHub release.
 enum WhatsNew {
     /// Copies updated from before What's New existed have no record; they are shown the releases after this one.
@@ -75,35 +76,77 @@ enum WhatsNew {
     }
 }
 
-/// The What's New card at the top right, opened on its own once after an update.
-struct WhatsNewPanel: View {
+/// The What's New pop-up: a card in the middle of the window, over a dimmed page, closed only with OK.
+struct WhatsNewCard: View {
+    static let width: CGFloat = 520
+    /// Kept clear above and below it in the window.
+    static let margin: CGFloat = 40
+    private static let padding: CGFloat = 24
+    private static let iconSize: CGFloat = 46
+
     @ObservedObject var model: GalleryModel
+    /// The room it may take; longer notes scroll inside the card.
+    let maxHeight: CGFloat
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("What's New").font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
-            ForEach(model.whatsNew, id: \.version) { release in
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Stanza \(release.version)").font(.system(size: 12, weight: .medium)).foregroundStyle(.white.opacity(0.55))
-                    ForEach(release.items.indices, id: \.self) { index in note(release.items[index]) }
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 14) {
+                Image(nsImage: NSApp.applicationIconImage).resizable()
+                    .frame(width: Self.iconSize, height: Self.iconSize)
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("What's New").font(.system(size: 22, weight: .semibold)).foregroundStyle(.white)
+                    Text("Stanza \(AppUpdater.currentVersion)").font(.system(size: 12.5)).foregroundStyle(.white.opacity(0.55))
                 }
+            }
+            .padding(Self.padding)
+            ViewThatFits(in: .vertical) {
+                notes
+                ScrollView(.vertical) { notes }.scrollIndicators(.visible)
             }
             PanelRule()
             HStack {
                 Button("All changes") { StanzaLinks.open(StanzaLinks.changes) }.buttonStyle(QuietButtonStyle())
                 Spacer()
-                Button("Done") { model.menu = nil }.buttonStyle(QuietButtonStyle())
+                Button("OK") { model.dismissWhatsNew() }
+                    .buttonStyle(PrimaryPillStyle())
+                    .keyboardShortcut(.defaultAction)
+            }
+            .padding(.horizontal, Self.padding)
+            .padding(.vertical, 16)
+        }
+        .frame(width: Self.width)
+        .modifier(GlassSurface(shape: RoundedRectangle(cornerRadius: 28, style: .continuous)))
+        .shadow(color: .black.opacity(0.5), radius: 40, y: 18)
+        .frame(maxHeight: maxHeight)
+        .accessibilityElement(children: .contain)
+        .accessibilityAddTraits(.isModal)
+    }
+
+    private var notes: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            ForEach(model.whatsNew, id: \.version) { release in
+                VStack(alignment: .leading, spacing: 8) {
+                    // The running version is in the header; earlier ones are named over their notes.
+                    if release.version != AppUpdater.currentVersion || model.whatsNew.count > 1 {
+                        Text("Stanza \(release.version)").font(.system(size: 12, weight: .medium)).foregroundStyle(.white.opacity(0.55))
+                    }
+                    ForEach(release.items.indices, id: \.self) { index in note(release.items[index]) }
+                }
             }
         }
+        .padding(.horizontal, Self.padding)
+        .padding(.bottom, Self.padding)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func note(_ item: ReleaseNotes.Item) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 7) {
-            Text("•").font(.system(size: 13)).foregroundStyle(.white.opacity(0.5)).accessibilityHidden(true)
-            Text(Self.styled(item.text)).font(.system(size: 13)).foregroundStyle(.white.opacity(0.88))
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text("•").font(.system(size: 14)).foregroundStyle(.white.opacity(0.5)).accessibilityHidden(true)
+            Text(Self.styled(item.text)).font(.system(size: 14)).foregroundStyle(.white.opacity(0.88))
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.leading, item.indented ? 14 : 0)
+        .padding(.leading, item.indented ? 16 : 0)
     }
 
     /// The changelog's **bold** names, kept bold.
