@@ -491,7 +491,11 @@ The per-song nudge, the album-cover colours, the tile stills and all map picture
 The self-check (`SelfCheck.swift`, `GallerySelfCheck.swift` and checks inside several styles) is a set of
 assert-style tests of the pure logic: parsing, matching, timing, the timeline, duets, colours, word pictures, script
 detection, the menu's style groups, gap dimming, the moved-lyrics clamp, and layout rules of Web, Messages,
-Notifications, Map, Money, Calendar and Voice Memo. There is no CI and there are no UI tests.
+Notifications, Map, Money, Calendar and Voice Memo. There are no UI tests.
+
+GitHub Actions (`.github/workflows/build.yml`) runs `./build.sh` on a macOS 26 runner for every push to `main` and
+every pull request, so a change that breaks the build or the self-check shows a red cross on GitHub. It has only read
+access to the repository and publishes nothing; releases are still made by `scripts/release.sh`.
 
 ## Key design decisions
 

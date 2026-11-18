@@ -7,7 +7,8 @@
 <p align="center"><b>The song you are playing, sung word by word across your Mac's desktop and lock screen.</b></p>
 
 <p align="center">
-  <a href="https://github.com/Rayhanson-Git/stanza/releases/latest"><img src="https://img.shields.io/badge/version-0.4.4-C2302F" alt="Version 0.4.4"></a>
+  <a href="https://github.com/Rayhanson-Git/stanza/releases/latest"><img src="https://img.shields.io/github/v/release/Rayhanson-Git/stanza?label=version&color=C2302F" alt="Latest version"></a>
+  <a href="https://github.com/Rayhanson-Git/stanza/actions/workflows/build.yml"><img src="https://github.com/Rayhanson-Git/stanza/actions/workflows/build.yml/badge.svg" alt="Build and self-check"></a>
   <img src="https://img.shields.io/badge/styles-23-C2302F" alt="23 styles">
   <img src="https://img.shields.io/badge/macOS-15%2B-2E6F73" alt="macOS 15 or later">
   <img src="https://img.shields.io/badge/Apple%20silicon-arm64-2E6F73" alt="Apple silicon (arm64)">
@@ -282,8 +283,9 @@ Version 0.4.6.
 - **The lyrics sources are not under this project's control.** The main source is an unofficial public endpoint of
   NetEase Cloud Music, with LRCLIB as the fallback. Either can change, limit or stop answering without notice. Some
   songs have no timed lyrics in either.
-- **No CI.** `./build.sh` runs a built-in self-check of the parsing, matching, timing and layout logic after every
-  build. There are no automated UI tests.
+- **Checked on every push, not UI-tested.** GitHub Actions builds every push and pull request on macOS and runs the
+  built-in self-check of the parsing, matching, timing and layout logic, as `./build.sh` does locally. There are no
+  automated UI tests.
 
 ## Privacy and network
 

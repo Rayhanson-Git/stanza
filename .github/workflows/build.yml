@@ -1,0 +1,23 @@
+# Builds Stanza and runs its self-check on every push to main and every pull request.
+# The runner has no release certificate, so build.sh signs this copy ad hoc; nothing is published from here.
+name: Build and self-check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # The code uses macOS 26 APIs behind availability checks, so it needs the macOS 26 SDK.
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: swiftc --version && xcrun --show-sdk-version
+      - name: Build and run the self-check
+        run: ./build.sh
