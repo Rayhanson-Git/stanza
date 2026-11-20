@@ -18,7 +18,7 @@
   <a href="#key-design-decisions">Decisions</a>
 </p>
 
-Stanza is one Swift executable of about 17,000 lines in 65 files under `Sources/`, built by `./build.sh` with
+Stanza is one Swift executable of about 17,500 lines in 68 files under `Sources/`, built by `./build.sh` with
 `swiftc` and Apple's Command Line Tools. It uses AppKit for the menu bar, windows and system services, SwiftUI for
 everything drawn, and one third-party framework, Sparkle, for updates. This page explains how the parts fit
 together and why they are built the way they are. File names are given so you can read along; everything here

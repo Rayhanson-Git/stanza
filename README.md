@@ -422,7 +422,7 @@ Both are backed up outside this Mac. On a new Mac, import the certificate's `.p1
 ## Project layout
 
 ```text
-Sources/            the app: 68 Swift files, about 17,000 lines
+Sources/            the app: 68 Swift files, about 17,500 lines
   main.swift          entry point and the command-line tools
   AppDelegate.swift   the menu-bar menu and app lifecycle
   GlobalShortcuts.swift, ShortcutViews.swift  keyboard shortcuts and their rows in Settings
